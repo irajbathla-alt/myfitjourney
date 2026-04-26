@@ -8,53 +8,180 @@
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%}
-body{background:#000;color:#fff;font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased;display:flex;justify-content:center;align-items:center;min-height:100vh;padding:18px}
-:root{--b:rgba(255,255,255,0.09);--s:#0d0d0d;--s2:#161616;--m:rgba(255,255,255,0.35);--red:#e05555;--green:#00D97E}
+body{background:#000;color:#fff;font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased;display:flex;justify-content:center;align-items:center;min-height:100vh}
+:root{--b:rgba(255,255,255,0.09);--b2:rgba(255,255,255,0.18);--s:#0d0d0d;--s2:#161616;--m:rgba(255,255,255,0.35);--red:#e05555;--green:#00D97E}
+
 .card{width:90%;max-width:390px;background:var(--s);border:1px solid var(--b);border-radius:20px;padding:36px 28px;box-shadow:0 40px 100px rgba(0,0,0,0.8);animation:up 0.55s cubic-bezier(0.16,1,0.3,1) both}
 @keyframes up{0%{opacity:0;transform:translateY(24px) scale(0.98)}100%{opacity:1;transform:none}}
-.back{display:inline-flex;align-items:center;gap:5px;font-size:12px;color:var(--m);text-decoration:none;margin-bottom:22px;transition:color 0.2s}.back:hover{color:#fff}
-.logo{font-family:'Cinzel',serif;font-size:15px;font-weight:900;letter-spacing:2.5px;text-transform:uppercase;color:#fff;text-align:center;margin-bottom:4px}.logo-sub{font-size:10px;color:var(--m);letter-spacing:1.5px;text-transform:uppercase;text-align:center;margin-bottom:26px}
-.tabs{display:flex;background:var(--s2);border-radius:10px;padding:3px;margin-bottom:22px;border:1px solid var(--b)}.tab{flex:1;padding:10px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;color:var(--m);transition:all 0.2s;border:none;background:transparent;font-family:'Inter',sans-serif}.tab.active{background:#fff;color:#000;box-shadow:0 2px 8px rgba(0,0,0,0.4)}
-.lbl{display:block;font-size:10px;font-weight:600;letter-spacing:1.2px;text-transform:uppercase;color:var(--m);margin-bottom:7px}input{width:100%;padding:13px 14px;margin-bottom:11px;background:var(--s2);border:1px solid var(--b);border-radius:10px;color:#fff;font-size:14px;font-family:'Inter',sans-serif;transition:border-color 0.2s,box-shadow 0.2s;outline:none}input:focus{border-color:rgba(255,255,255,0.35);box-shadow:0 0 0 3px rgba(255,255,255,0.05)}input::placeholder{color:rgba(255,255,255,0.18)}
-.submit{width:100%;padding:14px;border-radius:11px;border:none;font-family:'Cinzel',serif;font-size:13px;font-weight:700;letter-spacing:1.5px;cursor:pointer;background:#fff;color:#000;transition:all 0.2s ease;margin-top:3px}.submit:hover{background:rgba(255,255,255,0.88);transform:translateY(-1px);box-shadow:0 8px 24px rgba(255,255,255,0.1)}.submit:disabled{opacity:0.35;cursor:not-allowed;transform:none}.spin{display:inline-block;width:13px;height:13px;border:2px solid rgba(0,0,0,0.2);border-top-color:#000;border-radius:50%;animation:spin 0.7s linear infinite;vertical-align:middle;margin-right:6px}@keyframes spin{to{transform:rotate(360deg)}}
-#msg{min-height:18px;margin-top:11px;font-size:12px;text-align:center;border-radius:8px;transition:all 0.2s}#msg.error{color:var(--red);background:rgba(224,85,85,0.07);border:1px solid rgba(224,85,85,0.2);padding:9px 12px}#msg.ok{color:var(--green);background:rgba(0,217,126,0.08);border:1px solid rgba(0,217,126,0.22);padding:9px 12px}
-.success-wrap{display:none;text-align:center;padding:8px 0 4px;animation:up 0.5s cubic-bezier(0.16,1,0.3,1) both}.success-wrap.show{display:block}.success-icon{width:54px;height:54px;border-radius:50%;background:var(--green);margin:0 auto 18px;display:flex;align-items:center;justify-content:center;font-size:22px}.success-title{font-family:'Cinzel',serif;font-weight:900;font-size:20px;letter-spacing:1px;color:#fff;margin-bottom:10px}.success-body{font-size:13px;color:rgba(255,255,255,0.45);line-height:1.75}.success-body strong{color:var(--green);font-weight:600;display:block;margin-top:8px;font-size:11px;letter-spacing:1.5px;text-transform:uppercase}
-.btn-subscribe-green{display:flex;align-items:center;justify-content:center;width:100%;margin-top:14px;padding:15px;border-radius:11px;border:none;background:var(--green);color:#000;font-family:'Cinzel',serif;font-size:13px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;text-decoration:none;cursor:pointer;position:relative;overflow:hidden;transition:transform 0.25s,box-shadow 0.3s;animation:greenPulse 3s ease-in-out infinite}@keyframes greenPulse{0%,100%{box-shadow:0 4px 20px rgba(0,217,126,0.3)}50%{box-shadow:0 8px 36px rgba(0,217,126,0.55)}}.btn-subscribe-green:hover{transform:translateY(-2px);box-shadow:0 12px 40px rgba(0,217,126,0.65)}.hint{font-size:11px;color:rgba(255,255,255,.32);line-height:1.6;text-align:center;margin:8px 0 14px}
+
+.back{display:inline-flex;align-items:center;gap:5px;font-size:12px;color:var(--m);text-decoration:none;margin-bottom:22px;transition:color 0.2s}
+.back:hover{color:#fff}
+
+.logo{font-family:'Cinzel',serif;font-size:15px;font-weight:900;letter-spacing:2.5px;text-transform:uppercase;color:#fff;text-align:center;margin-bottom:4px}
+.logo-sub{font-size:10px;color:var(--m);letter-spacing:1.5px;text-transform:uppercase;text-align:center;margin-bottom:26px}
+
+.tabs{display:flex;background:var(--s2);border-radius:10px;padding:3px;margin-bottom:22px;border:1px solid var(--b)}
+.tab{flex:1;padding:10px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;color:var(--m);transition:all 0.2s;border:none;background:transparent;font-family:'Inter',sans-serif}
+.tab.active{background:#fff;color:#000;box-shadow:0 2px 8px rgba(0,0,0,0.4)}
+
+.lbl{display:block;font-size:10px;font-weight:600;letter-spacing:1.2px;text-transform:uppercase;color:var(--m);margin-bottom:7px}
+input{width:100%;padding:13px 14px;margin-bottom:11px;background:var(--s2);border:1px solid var(--b);border-radius:10px;color:#fff;font-size:14px;font-family:'Inter',sans-serif;transition:border-color 0.2s,box-shadow 0.2s;outline:none}
+input:focus{border-color:rgba(255,255,255,0.35);box-shadow:0 0 0 3px rgba(255,255,255,0.05)}
+input::placeholder{color:rgba(255,255,255,0.18)}
+
+/* Info box shown during Create Account tab */
+
+.submit{width:100%;padding:14px;border-radius:11px;border:none;font-family:'Cinzel',serif;font-size:13px;font-weight:700;letter-spacing:1.5px;cursor:pointer;background:#fff;color:#000;transition:all 0.2s ease;margin-top:3px}
+.submit:hover{background:rgba(255,255,255,0.88);transform:translateY(-1px);box-shadow:0 8px 24px rgba(255,255,255,0.1)}
+.submit:active{transform:translateY(0)}
+.submit:disabled{opacity:0.35;cursor:not-allowed;transform:none}
+
+.spin{display:inline-block;width:13px;height:13px;border:2px solid rgba(0,0,0,0.2);border-top-color:#000;border-radius:50%;animation:spin 0.7s linear infinite;vertical-align:middle;margin-right:6px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+#msg{min-height:18px;margin-top:11px;font-size:12px;text-align:center;border-radius:8px;transition:all 0.2s}
+#msg.error{color:var(--red);background:rgba(224,85,85,0.07);border:1px solid rgba(224,85,85,0.2);padding:9px 12px}
+
+/* ── SUCCESS STATE ── */
+.success-wrap{display:none;text-align:center;padding:8px 0 4px;animation:up 0.5s cubic-bezier(0.16,1,0.3,1) both}
+.success-wrap.show{display:block}
+.success-icon{width:54px;height:54px;border-radius:50%;background:var(--green);margin:0 auto 18px;display:flex;align-items:center;justify-content:center;font-size:22px;animation:popIn 0.45s cubic-bezier(0.34,1.56,0.64,1) both}
+@keyframes popIn{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
+.success-title{font-family:'Cinzel',serif;font-weight:900;font-size:20px;letter-spacing:1px;color:#fff;margin-bottom:10px}
+.success-body{font-size:13px;color:rgba(255,255,255,0.45);line-height:1.75}
+.success-body strong{color:var(--green);font-weight:600;display:block;margin-top:8px;font-size:11px;letter-spacing:1.5px;text-transform:uppercase}
+
+/* ── SUB NOTICE (always visible on create tab) ── */
+.sub-notice{margin-top:18px;padding:12px 14px;border:1px solid rgba(255,255,255,0.07);border-radius:10px;background:rgba(255,255,255,0.02);font-size:11px;color:rgba(255,255,255,0.3);line-height:1.7;text-align:center}
+.sub-notice a{color:var(--green);text-decoration:none;font-weight:600}
+.sub-notice a:hover{opacity:0.75}
+
+.btn-subscribe-green{display:flex;align-items:center;justify-content:center;width:100%;margin-top:14px;padding:15px;border-radius:11px;border:none;background:var(--green);color:#000;font-family:'Cinzel',serif;font-size:13px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;text-decoration:none;cursor:pointer;position:relative;overflow:hidden;transition:transform 0.25s,box-shadow 0.3s;animation:greenPulse 3s ease-in-out infinite}
+@keyframes greenPulse{0%,100%{box-shadow:0 4px 20px rgba(0,217,126,0.3)}50%{box-shadow:0 8px 36px rgba(0,217,126,0.55)}}
+.btn-subscribe-green::before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.22),transparent);transform:translateX(-100%);animation:btnShimmer 2.8s ease-in-out infinite}
+@keyframes btnShimmer{0%{transform:translateX(-100%)}55%,100%{transform:translateX(120%)}}
+.btn-subscribe-green:hover{transform:translateY(-2px);box-shadow:0 12px 40px rgba(0,217,126,0.65)}
 </style>
 </head>
 <body>
 <div class="card">
   <a class="back" href="index.html">&#8592; Back</a>
+
   <div class="logo">My Fit Journey</div>
   <div class="logo-sub">Member Portal</div>
+
   <div class="tabs">
-    <button class="tab active" id="t-in" onclick="sw('login')">Sign In</button>
-    <button class="tab" id="t-reg" onclick="sw('register')">Create Account</button>
+    <button class="tab active" id="t-in"  onclick="sw('login')">Sign In</button>
+    <button class="tab"        id="t-reg" onclick="sw('register')">Create Account</button>
   </div>
+
+  <!-- FORM (hidden when success shown) -->
   <div id="form-area">
     <label class="lbl">Email Address</label>
-    <input type="email" id="email" placeholder="you@example.com" autocomplete="email">
+    <input type="email"    id="email" placeholder="you@example.com"       autocomplete="email">
     <label class="lbl">Password</label>
-    <input type="password" id="pass" placeholder="Minimum 6 characters" autocomplete="current-password">
-    <div class="hint" id="hint">Login is verified from the member list in Google Sheets.</div>
+    <input type="password" id="pass"  placeholder="Minimum 6 characters"  autocomplete="current-password">
+
     <button class="submit" id="sub" onclick="go()">Sign In</button>
     <div id="msg"></div>
   </div>
+
+  <!-- SUCCESS (shown after register) -->
   <div class="success-wrap" id="success-wrap">
     <div class="success-icon">&#10003;</div>
     <div class="success-title">Account Created Successfully</div>
-    <p class="success-body">Your account has been added to the member list.<br><strong>Subscribe to activate access</strong></p>
-    <a href="https://square.link/u/E4LYxGUQ" target="_blank" class="btn-subscribe-green">Subscribe &mdash; $2 / Week</a>
+    <p class="success-body">
+      Waiting for subscription confirmation.<br>
+      <strong>Access granted within 24 hours</strong>
+    </p>
+    <div class="sub-notice" style="margin-top:16px">
+      A subscription is required to activate your account.
+    </div>
+    <a href="https://square.link/u/E4LYxGUQ" target="_blank" class="btn-subscribe-green">
+      Subscribe &mdash; $2 / Week
+    </a>
   </div>
 </div>
+
+<!-- Plain script: UI logic exposed to global scope so onclick handlers work -->
 <script>
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzPYoPFV6Ez73oq38hebKGFYEEqyOhCd8gBxwlChwJUoGWOc2HiEFurNUX2KXidjz0/exec";
+const SECRET     = "JFC2026PRIVATEKEY";
+
 let tab = 'login';
-function setMsg(t,c){const el=document.getElementById('msg');el.textContent=t;el.className=c||'';}
-function reset(){const btn=document.getElementById('sub');btn.disabled=false;btn.textContent=tab==='login'?'Sign In':'Create Account';}
-function sw(t){tab=t;document.getElementById('t-in').classList.toggle('active',t==='login');document.getElementById('t-reg').classList.toggle('active',t==='register');document.getElementById('sub').textContent=t==='login'?'Sign In':'Create Account';document.getElementById('hint').textContent=t==='login'?'Login is verified from the member list in Google Sheets.':'Create your member account, then subscribe using the same email.';setMsg('','');}
-async function api(payload){const res=await fetch(SCRIPT_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload)});return await res.json();}
-async function go(){const email=document.getElementById('email').value.trim().toLowerCase();const password=document.getElementById('pass').value.trim();if(!email||!password){setMsg('Please fill in both fields.','error');return;}if(password.length<6){setMsg('Password must be at least 6 characters.','error');return;}const btn=document.getElementById('sub');btn.disabled=true;btn.innerHTML='<span class="spin"></span>'+(tab==='login'?'Signing in…':'Creating account…');try{const data=await api({action:tab,email,password});if(!data.ok){throw new Error(data.message||'Request failed.');}localStorage.setItem('mfj_member_email',email);localStorage.setItem('mfj_member_token',data.token||'');localStorage.setItem('mfj_member_login_at',new Date().toISOString());if(tab==='login'){window.location.href='dashboard.html';}else{document.getElementById('form-area').style.display='none';document.getElementById('success-wrap').classList.add('show');}}catch(err){setMsg(err.message,'error');reset();}}
+
+function setMsg(t, c) { const el = document.getElementById('msg'); el.textContent = t; el.className = c; }
+function reset() { const btn = document.getElementById('sub'); btn.disabled = false; btn.textContent = tab === 'login' ? 'Sign In' : 'Create Account'; }
+
+function sw(t) {
+  tab = t;
+  document.getElementById('t-in').classList.toggle('active',  t === 'login');
+  document.getElementById('t-reg').classList.toggle('active', t === 'register');
+  document.getElementById('sub').textContent = t === 'login' ? 'Sign In' : 'Create Account';
+  setMsg('', '');
+}
+
+function go() {
+  const e = document.getElementById('email').value.trim();
+  const p = document.getElementById('pass').value.trim();
+  if (!e || !p)     { setMsg('Please fill in both fields.', 'error'); return; }
+  if (p.length < 6) { setMsg('Password must be at least 6 characters.', 'error'); return; }
+
+  const btn = document.getElementById('sub');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spin"></span>' + (tab === 'login' ? 'Signing in\u2026' : 'Creating account\u2026');
+  setMsg('', '');
+
+  if (tab === 'login') {
+    window._fbSignIn(e, p);
+  } else {
+    window._fbRegister(e, p);
+  }
+}
+</script>
+
+<!-- Module script: Firebase only — calls back into globals above -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword }
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+const auth = getAuth(initializeApp({
+  apiKey:            "AIzaSyCTQDlsZNhZ-I6CvlNgZDPgpJJYlYto6Rk",
+  authDomain:        "jalandhar-fitness-club.firebaseapp.com",
+  projectId:         "jalandhar-fitness-club",
+  storageBucket:     "jalandhar-fitness-club.firebasestorage.app",
+  messagingSenderId: "899365845803",
+  appId:             "1:899365845803:web:a75a331462df8b017f236e"
+}));
+
+window._fbSignIn = (e, p) => {
+  signInWithEmailAndPassword(auth, e, p)
+    .then(() => window.location.href = 'dashboard.html')
+    .catch(err => {
+      setMsg(err.code === 'auth/invalid-credential'
+        ? 'Incorrect email or password.' : err.message, 'error');
+      reset();
+    });
+};
+
+window._fbRegister = (e, p) => {
+  createUserWithEmailAndPassword(auth, e, p)
+    .then(() => {
+      fetch(SCRIPT_URL, {
+        method: 'POST', mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: e, secret: SECRET })
+      });
+      document.getElementById('form-area').style.display = 'none';
+      document.getElementById('success-wrap').classList.add('show');
+    })
+    .catch(err => {
+      setMsg(err.code === 'auth/email-already-in-use'
+        ? 'An account with this email already exists — try signing in.' : err.message, 'error');
+      reset();
+    });
+};
 </script>
 </body>
 </html>
