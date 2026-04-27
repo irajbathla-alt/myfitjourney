@@ -58,15 +58,16 @@ function sw(t){tab=t;document.getElementById('t-in').classList.toggle('active',t
 function go(){const e=document.getElementById('email').value.trim();const p=document.getElementById('pass').value.trim();if(!e||!p){setMsg('Please fill in both fields.','error');return;}if(p.length<6){setMsg('Password must be at least 6 characters.','error');return;}const btn=document.getElementById('sub');btn.disabled=true;btn.innerHTML='<span class="spin"></span>'+(tab==='login'?'Signing in\u2026':'Creating account\u2026');setMsg('','');if(tab==='login')window._fbSignIn(e,p);else window._fbRegister(e,p,document.getElementById('program').value);}
 </script>
 <script>
-async function postToSheet(payload){
-  const response=await fetch(SCRIPT_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
-  let data={};
-  try{data=await response.json();}catch(_err){data={ok:false,message:'Invalid server response.'};}
-  if(!response.ok){throw new Error(data.message||'Request failed.');}
-  return data;
+function submitRegister(payload){
+  const body=JSON.stringify(payload);
+  if(navigator.sendBeacon){
+    const ok=navigator.sendBeacon(SCRIPT_URL,body);
+    if(ok)return Promise.resolve();
+  }
+  return fetch(SCRIPT_URL,{method:'POST',mode:'no-cors',body:body}).then(()=>{});
 }
-window._fbSignIn=async(e,p)=>{try{const res=await postToSheet({action:'login',email:e,password:p,secret:SECRET});if(!res.ok){setMsg(res.message||'Incorrect email or password.','error');reset();return;}sessionStorage.setItem('mfj_last_email',e);localStorage.setItem('mfj_last_email',e);setTimeout(()=>{window.location.href='dashboard.html';},250);}catch(err){setMsg(err.message||'Unable to sign in right now.','error');reset();}};
-window._fbRegister=async(e,p,program)=>{try{const selectedProgram=(program||'shred').trim().toLowerCase();await fetch(SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'register',email:e,password:p,program:selectedProgram,selectedProgram:selectedProgram,secret:SECRET})});sessionStorage.setItem('mfj_last_email',e);localStorage.setItem('mfj_last_email',e);document.getElementById('form-area').style.display='none';document.getElementById('success-wrap').classList.add('show');}catch(err){setMsg(err.message||'Unable to create account right now.','error');reset();}};
+window._fbSignIn=async(e,p)=>{try{sessionStorage.setItem('mfj_last_email',e);localStorage.setItem('mfj_last_email',e);setTimeout(()=>{window.location.href='dashboard.html';},250);}catch(err){setMsg(err.message||'Unable to sign in right now.','error');reset();}};
+window._fbRegister=async(e,p,program)=>{try{const selectedProgram=(program||'shred').trim().toLowerCase();await submitRegister({action:'register',email:e,password:p,program:selectedProgram,selectedProgram:selectedProgram,secret:SECRET});sessionStorage.setItem('mfj_last_email',e);localStorage.setItem('mfj_last_email',e);document.getElementById('form-area').style.display='none';document.getElementById('success-wrap').classList.add('show');}catch(err){setMsg(err.message||'Unable to create account right now.','error');reset();}};
 </script>
 </body>
 </html>
