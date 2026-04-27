@@ -17,22 +17,44 @@ const HEADERS = [
 function doPost(e) {
   try {
     const data = parseIncomingBody(e);
-    const action = String(data.action || "").trim().toLowerCase();
-    const secret = String(data.secret || "").trim();
-
-    if (secret !== SECRET) {
-      return jsonResponse({ ok: false, message: "Unauthorized request." });
-    }
-
-    if (action === "register") return jsonResponse(registerMember(data));
-    if (action === "login") return jsonResponse(loginMember(data));
-    if (action === "verify") return jsonResponse(verifyMember(data));
-    if (action === "update_program") return jsonResponse(updateProgram(data));
-
-    return jsonResponse({ ok: false, message: "Invalid action." });
+    return jsonResponse(handleRequest(data));
   } catch (err) {
     return jsonResponse({ ok: false, message: err.message || "Server error." });
   }
+}
+
+function doGet(e) {
+  try {
+    const data = (e && e.parameter) ? e.parameter : {};
+    const response = handleRequest(data);
+    const callback = String(data.callback || "").trim();
+
+    if (!callback) {
+      return jsonResponse(response);
+    }
+
+    return ContentService
+      .createTextOutput(callback + "(" + JSON.stringify(response) + ");")
+      .setMimeType(ContentService.MimeType.JAVASCRIPT);
+  } catch (err) {
+    return jsonResponse({ ok: false, message: err.message || "Server error." });
+  }
+}
+
+function handleRequest(data) {
+  const action = String(data.action || "").trim().toLowerCase();
+  const secret = String(data.secret || "").trim();
+
+  if (secret !== SECRET) {
+    return { ok: false, message: "Unauthorized request." };
+  }
+
+  if (action === "register") return registerMember(data);
+  if (action === "login") return loginMember(data);
+  if (action === "verify") return verifyMember(data);
+  if (action === "update_program") return updateProgram(data);
+
+  return { ok: false, message: "Invalid action." };
 }
 
 function parseIncomingBody(e) {
