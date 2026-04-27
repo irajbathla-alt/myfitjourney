@@ -49,21 +49,25 @@ option{background:#161616;color:#fff}.program-field{display:none}
 <div class="success-wrap" id="success-wrap"><div class="success-icon">&#10003;</div><div class="success-title">Account Created Successfully</div><p class="success-body">Waiting for subscription confirmation.<br><strong>Access granted within 24 hours</strong></p><div class="sub-notice" style="margin-top:16px">A subscription is required to activate your account.</div><a href="https://square.link/u/E4LYxGUQ" target="_blank" class="btn-subscribe-green">Subscribe &mdash; $2 / Week</a></div>
 </div>
 <script>
-const SCRIPT_URL="https://script.google.com/macros/s/"+"AKfycbzPYoPFV6Ez73oq38hebKGFYEEqyOhCd8gBxwlChwJUoGWOc2HiEFurNUX2KXidjz0"+"/exec";
-const SECRET="JFC"+"2026"+"PRIVATEKEY";
+const SCRIPT_URL="https://script.google.com/macros/s/AKfycbwt1QBvLAf1yWfOMBEeq1b1YpEM6D97crZ5UcTU-x6ncd0l6rfX7agNG8N9OpwymhQ/exec";
+const SECRET="JFC2026PRIVATEKEY";
 let tab='login';
 function setMsg(t,c){const el=document.getElementById('msg');el.textContent=t;el.className=c;}
 function reset(){const btn=document.getElementById('sub');btn.disabled=false;btn.textContent=tab==='login'?'Sign In':'Create Account';}
 function sw(t){tab=t;document.getElementById('t-in').classList.toggle('active',t==='login');document.getElementById('t-reg').classList.toggle('active',t==='register');document.getElementById('sub').textContent=t==='login'?'Sign In':'Create Account';document.getElementById('programField').style.display=t==='register'?'block':'none';setMsg('','');}
 function go(){const e=document.getElementById('email').value.trim();const p=document.getElementById('pass').value.trim();if(!e||!p){setMsg('Please fill in both fields.','error');return;}if(p.length<6){setMsg('Password must be at least 6 characters.','error');return;}const btn=document.getElementById('sub');btn.disabled=true;btn.innerHTML='<span class="spin"></span>'+(tab==='login'?'Signing in\u2026':'Creating account\u2026');setMsg('','');if(tab==='login')window._fbSignIn(e,p);else window._fbRegister(e,p,document.getElementById('program').value);}
 </script>
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-const app = initializeApp({apiKey:"AIzaSy"+"CTQDlsZNhZ-I6CvlNgZDPgpJJYlYto6Rk",authDomain:"jalandhar-fitness-club.firebaseapp.com",projectId:"jalandhar-fitness-club",storageBucket:"jalandhar-fitness-club.firebasestorage.app",messagingSenderId:"899365845803",appId:"1:899365845803:web:a75a331462df8b017f236e"});
-const auth=getAuth(app);const persistenceReady=setPersistence(auth,browserLocalPersistence);
-window._fbSignIn=async(e,p)=>{try{await persistenceReady;await signInWithEmailAndPassword(auth,e,p);sessionStorage.setItem('mfj_last_email',e);setTimeout(()=>{window.location.href='dashboard.html';},250);}catch(err){setMsg(err.code==='auth/invalid-credential'?'Incorrect email or password.':err.message,'error');reset();}};
-window._fbRegister=async(e,p,program)=>{try{await persistenceReady;await createUserWithEmailAndPassword(auth,e,p);sessionStorage.setItem('mfj_last_email',e);fetch(SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:e,program:program,secret:SECRET})});document.getElementById('form-area').style.display='none';document.getElementById('success-wrap').classList.add('show');}catch(err){setMsg(err.code==='auth/email-already-in-use'?'An account with this email already exists — try signing in.':err.message,'error');reset();}};
+<script>
+function submitRegister(payload){
+  const body=JSON.stringify(payload);
+  if(navigator.sendBeacon){
+    const ok=navigator.sendBeacon(SCRIPT_URL,body);
+    if(ok)return Promise.resolve();
+  }
+  return fetch(SCRIPT_URL,{method:'POST',mode:'no-cors',body:body}).then(()=>{});
+}
+window._fbSignIn=async(e,p)=>{try{sessionStorage.setItem('mfj_last_email',e);localStorage.setItem('mfj_last_email',e);setTimeout(()=>{window.location.href='dashboard.html';},250);}catch(err){setMsg(err.message||'Unable to sign in right now.','error');reset();}};
+window._fbRegister=async(e,p,program)=>{try{const selectedProgram=(program||'shred').trim().toLowerCase();await submitRegister({action:'register',email:e,password:p,program:selectedProgram,selectedProgram:selectedProgram,secret:SECRET});sessionStorage.setItem('mfj_last_email',e);localStorage.setItem('mfj_last_email',e);document.getElementById('form-area').style.display='none';document.getElementById('success-wrap').classList.add('show');}catch(err){setMsg(err.message||'Unable to create account right now.','error');reset();}};
 </script>
 </body>
 </html>
