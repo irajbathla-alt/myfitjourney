@@ -66,7 +66,7 @@ async function postToSheet(payload){
   return data;
 }
 window._fbSignIn=async(e,p)=>{try{const res=await postToSheet({action:'login',email:e,password:p,secret:SECRET});if(!res.ok){setMsg(res.message||'Incorrect email or password.','error');reset();return;}sessionStorage.setItem('mfj_last_email',e);localStorage.setItem('mfj_last_email',e);setTimeout(()=>{window.location.href='dashboard.html';},250);}catch(err){setMsg(err.message||'Unable to sign in right now.','error');reset();}};
-window._fbRegister=async(e,p,program)=>{try{const res=await postToSheet({action:'register',email:e,password:p,program:program,secret:SECRET});if(!res.ok){setMsg(res.message||'Unable to create account.','error');reset();return;}sessionStorage.setItem('mfj_last_email',e);localStorage.setItem('mfj_last_email',e);document.getElementById('form-area').style.display='none';document.getElementById('success-wrap').classList.add('show');}catch(err){setMsg(err.message||'Unable to create account right now.','error');reset();}};
+window._fbRegister=async(e,p,program)=>{try{const selectedProgram=(program||'shred').trim().toLowerCase();await fetch(SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'register',email:e,password:p,program:selectedProgram,selectedProgram:selectedProgram,secret:SECRET})});sessionStorage.setItem('mfj_last_email',e);localStorage.setItem('mfj_last_email',e);document.getElementById('form-area').style.display='none';document.getElementById('success-wrap').classList.add('show');}catch(err){setMsg(err.message||'Unable to create account right now.','error');reset();}};
 </script>
 </body>
 </html>
