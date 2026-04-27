@@ -50,21 +50,23 @@ option{background:#161616;color:#fff}.program-field{display:none}
 </div>
 <script>
 const SCRIPT_URL="https://script.google.com/macros/s/AKfycbwoXa1mNzKUlA2jWL7bwzGJ2Cb5-3ZUscOc5-ADkUM84YGVqcVq1hSzcac7KGICXG4/exec";
-const SECRET="JFC"+"2026"+"PRIVATEKEY";
-const PROGRAM_AMOUNTS={shred:2,strength:2,bikini:2};
+const SECRET="JFC2026PRIVATEKEY";
 let tab='login';
 function setMsg(t,c){const el=document.getElementById('msg');el.textContent=t;el.className=c;}
 function reset(){const btn=document.getElementById('sub');btn.disabled=false;btn.textContent=tab==='login'?'Sign In':'Create Account';}
 function sw(t){tab=t;document.getElementById('t-in').classList.toggle('active',t==='login');document.getElementById('t-reg').classList.toggle('active',t==='register');document.getElementById('sub').textContent=t==='login'?'Sign In':'Create Account';document.getElementById('programField').style.display=t==='register'?'block':'none';setMsg('','');}
 function go(){const e=document.getElementById('email').value.trim();const p=document.getElementById('pass').value.trim();if(!e||!p){setMsg('Please fill in both fields.','error');return;}if(p.length<6){setMsg('Password must be at least 6 characters.','error');return;}const btn=document.getElementById('sub');btn.disabled=true;btn.innerHTML='<span class="spin"></span>'+(tab==='login'?'Signing in\u2026':'Creating account\u2026');setMsg('','');if(tab==='login')window._fbSignIn(e,p);else window._fbRegister(e,p,document.getElementById('program').value);}
 </script>
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-const app = initializeApp({apiKey:"AIzaSy"+"CTQDlsZNhZ-I6CvlNgZDPgpJJYlYto6Rk",authDomain:"jalandhar-fitness-club.firebaseapp.com",projectId:"jalandhar-fitness-club",storageBucket:"jalandhar-fitness-club.firebasestorage.app",messagingSenderId:"899365845803",appId:"1:899365845803:web:a75a331462df8b017f236e"});
-const auth=getAuth(app);const persistenceReady=setPersistence(auth,browserLocalPersistence);
-window._fbSignIn=async(e,p)=>{try{await persistenceReady;await signInWithEmailAndPassword(auth,e,p);sessionStorage.setItem('mfj_last_email',e);localStorage.setItem('mfj_last_email',e);setTimeout(()=>{window.location.href='dashboard.html';},250);}catch(err){setMsg(err.code==='auth/invalid-credential'?'Incorrect email or password.':err.message,'error');reset();}};
-window._fbRegister=async(e,p,program)=>{try{await persistenceReady;await createUserWithEmailAndPassword(auth,e,p);sessionStorage.setItem('mfj_last_email',e);localStorage.setItem('mfj_last_email',e);const amount=PROGRAM_AMOUNTS[program]??2;fetch(SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:e,program:program,amount:amount,billing:'weekly',secret:SECRET})});document.getElementById('form-area').style.display='none';document.getElementById('success-wrap').classList.add('show');}catch(err){setMsg(err.code==='auth/email-already-in-use'?'An account with this email already exists — try signing in.':err.message,'error');reset();}};
+<script>
+async function postToSheet(payload){
+  const response=await fetch(SCRIPT_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+  let data={};
+  try{data=await response.json();}catch(_err){data={ok:false,message:'Invalid server response.'};}
+  if(!response.ok){throw new Error(data.message||'Request failed.');}
+  return data;
+}
+window._fbSignIn=async(e,p)=>{try{const res=await postToSheet({action:'login',email:e,password:p,secret:SECRET});if(!res.ok){setMsg(res.message||'Incorrect email or password.','error');reset();return;}sessionStorage.setItem('mfj_last_email',e);localStorage.setItem('mfj_last_email',e);setTimeout(()=>{window.location.href='dashboard.html';},250);}catch(err){setMsg(err.message||'Unable to sign in right now.','error');reset();}};
+window._fbRegister=async(e,p,program)=>{try{const res=await postToSheet({action:'register',email:e,password:p,program:program,secret:SECRET});if(!res.ok){setMsg(res.message||'Unable to create account.','error');reset();return;}sessionStorage.setItem('mfj_last_email',e);localStorage.setItem('mfj_last_email',e);document.getElementById('form-area').style.display='none';document.getElementById('success-wrap').classList.add('show');}catch(err){setMsg(err.message||'Unable to create account right now.','error');reset();}};
 </script>
 </body>
 </html>
