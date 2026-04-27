@@ -975,28 +975,11 @@ daySelect.value = String(state.day);
 renderPlan();
 </script>
 
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getAuth, onAuthStateChanged } 
-from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-
-const firebaseConfig = {
-  apiKey: "AIzaSyCTQDlsZNhZ-I6CvlNgZDPgpJJYlYto6Rk",
-  authDomain: "jalandhar-fitness-club.firebaseapp.com",
-  projectId: "jalandhar-fitness-club",
-  storageBucket: "jalandhar-fitness-club.firebasestorage.app",
-  messagingSenderId: "899365845803",
-  appId: "1:899365845803:web:a75a331462df8b017f236e"
-};
-
-initializeApp(firebaseConfig);
-const auth = getAuth();
-
-onAuthStateChanged(auth, (user)=>{
-  if(!user){
-    window.location.href="login.html";
-  }
-});
+<script>
+const memberEmail=(sessionStorage.getItem("mfj_last_email")||localStorage.getItem("mfj_last_email")||"").trim().toLowerCase();
+if(!memberEmail){
+  window.location.href="login.html";
+}
 </script>
 </body>
 </html>
