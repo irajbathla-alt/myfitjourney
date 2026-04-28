@@ -1,9 +1,12 @@
 window.mfjCallApi = function(action, payload, timeoutMs){
-  const callbackName = "mfjApiCb_" + Date.now() + "_" + Math.floor(Math.random()*1000);
   const timeout = Number(timeoutMs || 10000);
   const safePayload = payload || {};
+  const baseUrls = Array.isArray(window.MFJ_SCRIPT_URLS) && window.MFJ_SCRIPT_URLS.length
+    ? window.MFJ_SCRIPT_URLS
+    : [window.MFJ_SCRIPT_URL];
 
-  return new Promise((resolve, reject) => {
+  const callViaJsonp = (baseUrl) => new Promise((resolve, reject) => {
+    const callbackName = "mfjApiCb_" + Date.now() + "_" + Math.floor(Math.random() * 1000);
     const script = document.createElement("script");
     const timer = window.setTimeout(() => {
       cleanup();
@@ -34,10 +37,20 @@ window.mfjCallApi = function(action, payload, timeoutMs){
       action: action,
       secret: window.MFJ_SECRET,
       callback: callbackName,
+      _ts: String(Date.now()),
+      _r: String(Math.random()),
       ...safePayload
     });
 
-    script.src = window.MFJ_SCRIPT_URL + "?" + params.toString();
+    script.src = baseUrl + "?" + params.toString();
     document.body.appendChild(script);
   });
+
+  const attempts = [];
+  baseUrls.forEach((url) => {
+    attempts.push(() => callViaJsonp(url));
+    attempts.push(() => callViaJsonp(url));
+  });
+
+  return attempts.reduce((chain, attemptFn) => chain.catch(() => attemptFn()), Promise.reject());
 };
