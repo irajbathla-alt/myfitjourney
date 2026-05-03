@@ -2,9 +2,9 @@ window.MFJ_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzFaX1x1qPqDqGj
 window.MFJ_APP_KEY = "MFJ_PUBLIC_APP";
 window.MFJ_SECRET = "JFC" + "2026" + "PRIVATEKEY";
 window.MFJ_PROGRAMS = [
-  { id:"strength", name:"Strength Builder", sub:"8 Weeks · Progressive Overload", body:"Build serious muscle and hit new personal bests.", pills:["Muscle Build","8 Weeks","5 Days/Week","Compound Lifts"], color:"#82b4e8", activeClass:"active-strength", btnClass:"prog-dl-strength" },
-  { id:"shred", name:"4 Weeks 2 Shred", sub:"28 Days · Get Ripped · DTPXtreme", body:"Get shredded with focused training and nutrition.", pills:["Fat Loss","28 Days","4 Days/Week","Daily Cardio"], color:"#f0a070", activeClass:"active-shred", btnClass:"prog-dl-shred" },
-  { id:"bikini", name:"Bikini Program", sub:"8 Weeks · Sculpt & Tone", body:"Sculpt a toned physique with glute and lower-body focus.", pills:["Sculpt","8 Weeks","5 Days/Week","Glute Focus"], color:"#f0a0c8", activeClass:"active-bikini", btnClass:"prog-dl-bikini" }
+  { id:"strength", name:"Strength Builder", sub:"8 Weeks · Progressive Overload", body:"Build serious muscle and hit new personal bests.", pills:["8 Weeks","5 Days/Week","Compound Lifts"], color:"#82b4e8", activeClass:"active-strength", btnClass:"prog-dl-strength" },
+  { id:"shred", name:"4 Weeks 2 Shred", sub:"28 Days · Get Ripped · DTPXtreme", body:"Get shredded with focused training and nutrition.", pills:["28 Days","4 Days/Week","Daily Cardio"], color:"#f0a070", activeClass:"active-shred", btnClass:"prog-dl-shred" },
+  { id:"bikini", name:"Bikini Program", sub:"8 Weeks · Sculpt & Tone", body:"Sculpt a toned physique with glute and lower-body focus.", pills:["8 Weeks","5 Days/Week","Glute Focus"], color:"#f0a0c8", activeClass:"active-bikini", btnClass:"prog-dl-bikini" }
 ];
 window.MFJ_PROGRAMS_KEY = "mfj_admin_programs";
 window.getMfjPrograms = function(){
@@ -45,7 +45,6 @@ window.getMfjPrograms = function(){
       .prog-card-sub{color:rgba(255,255,255,.65)!important;opacity:1!important;}
       .prog-card-body{color:rgba(255,255,255,.68)!important;}
       .prog-pill{background:rgba(255,255,255,.035)!important;border-color:rgba(255,255,255,.16)!important;color:rgba(255,255,255,.62)!important;}
-      .prog-pill:first-child{color:#00D97E!important;border-color:rgba(0,217,126,.28)!important;background:rgba(0,217,126,.055)!important;}
       .prog-dl{box-shadow:inset 0 1px 0 rgba(255,255,255,.06)!important;}
       .stats{background:rgba(255,255,255,.018)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.035)!important;}
       .stat-n{font-size:16px!important;}
@@ -55,8 +54,6 @@ window.getMfjPrograms = function(){
       .btn-login,.btn-subscribe,.prog-dl,.submit{transition:transform .22s ease,box-shadow .22s ease,filter .22s ease!important;}
       .btn-login:hover,.btn-subscribe:hover,.submit:hover{transform:translateY(-2px) scale(1.01)!important;}
       .mfj-included{width:100%;margin:-3px 0 9px;padding:8px 10px;border:1px solid rgba(255,255,255,.08);border-radius:10px;background:rgba(255,255,255,.018);font-size:8px;line-height:1.65;letter-spacing:1.55px;text-transform:uppercase;color:rgba(255,255,255,.36);}
-      .mfj-mini-proof{width:100%;display:flex;gap:6px;margin:0 0 9px;}
-      .mfj-mini-proof span{flex:1;border:1px solid rgba(255,255,255,.08);border-radius:9px;padding:6px 4px;background:rgba(255,255,255,.018);font-size:7px;letter-spacing:1.25px;text-transform:uppercase;color:rgba(255,255,255,.34);}
       .cta-note{color:rgba(255,255,255,.28)!important;line-height:1.55!important;}
       .mfj-footer{margin-top:8px;font-size:8px;letter-spacing:1.7px;text-transform:uppercase;color:rgba(255,255,255,.16);}
       .admin-link{opacity:.18!important;transition:opacity .2s ease!important;}
@@ -67,8 +64,8 @@ window.getMfjPrograms = function(){
       .success-icon{box-shadow:0 0 32px rgba(0,217,126,.42)!important;}
       #message::after{content:"";display:block;width:46px;height:2px;margin:13px auto 0;border-radius:999px;background:linear-gradient(90deg,transparent,#00D97E,transparent);animation:mfjPulse 1.35s ease-in-out infinite;}
       @keyframes mfjPulse{0%,100%{opacity:.25;transform:scaleX(.75)}50%{opacity:1;transform:scaleX(1)}}
-      @media (max-height:740px){.mfj-footer{display:none}.mfj-included{padding:6px 8px}.mfj-mini-proof{display:none}.prog-card{padding:10px!important}}
-      @media (max-width:380px){.wordmark{letter-spacing:3.8px!important}.prog-card-title{padding-right:0!important}.prog-card::after{display:none}.mfj-included{font-size:7px;letter-spacing:1.1px}.mfj-mini-proof span{font-size:6.5px}}
+      @media (max-height:740px){.mfj-footer{display:none}.mfj-included{padding:6px 8px}.prog-card{padding:10px!important}}
+      @media (max-width:380px){.wordmark{letter-spacing:3.8px!important}.prog-card-title{padding-right:0!important}.prog-card::after{display:none}.mfj-included{font-size:7px;letter-spacing:1.1px}}
     `;
     document.head.appendChild(style);
 
@@ -87,14 +84,6 @@ window.getMfjPrograms = function(){
       included.className = "mfj-included";
       included.innerHTML = "Workout Plans · Member Dashboard · Program Access · Progress Tracking";
       stats.parentNode.insertBefore(included, stats);
-    }
-
-    const included = document.querySelector(".mfj-included");
-    if(included && !document.querySelector(".mfj-mini-proof")){
-      const proof = document.createElement("div");
-      proof.className = "mfj-mini-proof";
-      proof.innerHTML = "<span>Mobile Ready</span><span>Weekly Access</span><span>Built For Consistency</span>";
-      included.insertAdjacentElement("afterend", proof);
     }
 
     const cta = document.querySelector(".cta-note");
