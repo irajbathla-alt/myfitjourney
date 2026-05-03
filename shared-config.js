@@ -4,8 +4,7 @@ window.MFJ_SECRET = "JFC" + "2026" + "PRIVATEKEY";
 window.MFJ_PROGRAMS = [
   { id:"strength", name:"Strength Builder", sub:"8 Weeks · Progressive Overload", body:"Build serious muscle and hit new personal bests.", pills:["8 Weeks","5 Days/Week","Compound Lifts"], color:"#82b4e8", activeClass:"active-strength", btnClass:"prog-dl-strength" },
   { id:"shred", name:"4 Weeks 2 Shred", sub:"28 Days · Get Ripped · DTPXtreme", body:"Get shredded with focused training and nutrition.", pills:["28 Days","4 Days/Week","Daily Cardio"], color:"#f0a070", activeClass:"active-shred", btnClass:"prog-dl-shred" },
-  { id:"bikini", name:"Bikini Program", sub:"8 Weeks · Sculpt & Tone", body:"Sculpt a toned physique with glute and lower-body focus.", pills:["8 Weeks","5 Days/Week","Glute Focus"], color:"#f0a0c8", activeClass:"active-bikini", btnClass:"prog-dl-bikini" },
-  { id:"p4", name:"Program 4", sub:"New Upload", body:"Add your custom details here after uploading p4.html.", pills:["New","Custom"], color:"#9ca3af", activeClass:"active-strength", btnClass:"prog-dl-strength" }
+  { id:"bikini", name:"Bikini Program", sub:"8 Weeks · Sculpt & Tone", body:"Sculpt a toned physique with glute and lower-body focus.", pills:["8 Weeks","5 Days/Week","Glute Focus"], color:"#f0a0c8", activeClass:"active-bikini", btnClass:"prog-dl-bikini" }
 ];
 window.MFJ_PROGRAMS_KEY = "mfj_admin_programs";
 window.getMfjPrograms = function(){
