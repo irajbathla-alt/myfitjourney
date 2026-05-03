@@ -77,9 +77,11 @@ async function loadPrograms(){
 loadPrograms();
 document.getElementById('adminBox').style.display = location.search.includes('admin=1') ? 'block' : 'none';
 window.addProgram = function(){
+  const adminPass = window.prompt('Enter admin password to add program:','') || '';
   const id=document.getElementById('a-id').value.trim().toLowerCase();
   const name=document.getElementById('a-name').value.trim();
   const file=document.getElementById('a-file').value.trim();
+  if(adminPass !== ['VFC','2026!'].join('')){ setMsg('Invalid admin password.','error'); return; }
   if(!id || !name || !file){ setMsg('Fill all admin fields.','error'); return; }
   let admin=[]; try{ admin=JSON.parse(localStorage.getItem(window.MFJ_PROGRAMS_KEY)||"[]"); }catch(_e){}
   admin=admin.filter(p=>p.id!==id);
