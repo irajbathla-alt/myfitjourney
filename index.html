@@ -114,7 +114,10 @@ const PROGRAMS = (window.MFJ_PROGRAMS||[]).filter(p=>p && p.id);
 let currentIndex = 0;
 function renderProgram(){
   const p=PROGRAMS[currentIndex]; if(!p) return;
-  document.getElementById('tabs').innerHTML = PROGRAMS.map((x,i)=>`<div class="tab ${i===currentIndex?(x.activeClass||'active-strength'):''}" onclick="goTo(${i})">${x.name.split(' ')[0]}</div>`).join('');
+  document.getElementById('tabs').innerHTML = PROGRAMS.map((x,i)=>{
+    const label = x.id === 'shred' ? 'Shred' : (x.tabLabel || x.name.split(' ')[0]);
+    return `<div class="tab ${i===currentIndex?(x.activeClass||'active-strength'):''}" onclick="goTo(${i})">${label}</div>`;
+  }).join('');
   document.getElementById('program-card').innerHTML = `<div class="prog-card-title" style="color:${p.color||'#fff'}">${p.name}</div><div class="prog-card-sub">${p.sub||''}</div><div class="prog-card-body">${p.body||''}</div><div class="prog-pills">${(p.pills||[]).map(v=>`<span class='prog-pill'>${v}</span>`).join('')}</div><button class="prog-dl ${p.btnClass||'prog-dl-strength'}" onclick="dlPdf('${p.id}')">&#8595; &nbsp; Download Program Overview</button>`;
 }
 function slide(step){ if(!PROGRAMS.length)return; currentIndex=(currentIndex+step+PROGRAMS.length)%PROGRAMS.length; renderProgram(); }
