@@ -13,6 +13,8 @@ body{background:#000;color:#fff;font-family:'Inter',sans-serif;-webkit-font-smoo
 .card{width:90%;max-width:390px;background:var(--s);border:1px solid var(--b);border-radius:20px;padding:36px 28px;box-shadow:0 40px 100px rgba(0,0,0,0.8);animation:up 0.55s cubic-bezier(0.16,1,0.3,1) both}
 @keyframes up{0%{opacity:0;transform:translateY(24px) scale(0.98)}100%{opacity:1;transform:none}}
 .back{display:inline-flex;align-items:center;gap:5px;font-size:12px;color:var(--m);text-decoration:none;margin-bottom:22px;transition:color 0.2s}.back:hover{color:#fff}
+.admin-link{float:right;font-size:11px;color:rgba(255,255,255,.35);text-decoration:none;margin-top:2px}
+.admin-link:hover{color:#fff}
 .logo{font-family:'Cinzel',serif;font-size:15px;font-weight:900;letter-spacing:2.5px;text-transform:uppercase;color:#fff;text-align:center;margin-bottom:4px}
 .logo-sub{font-size:10px;color:var(--m);letter-spacing:1.5px;text-transform:uppercase;text-align:center;margin-bottom:26px}
 .tabs{display:flex;background:var(--s2);border-radius:10px;padding:3px;margin-bottom:22px;border:1px solid var(--b)}
@@ -33,18 +35,28 @@ option{background:#161616;color:#fff}.program-field{display:none}
 .success-title{font-family:'Cinzel',serif;font-weight:900;font-size:20px;letter-spacing:1px;color:#fff;margin-bottom:10px}.success-body{font-size:13px;color:rgba(255,255,255,0.45);line-height:1.75}.success-body strong{color:var(--green);font-weight:600;display:block;margin-top:8px;font-size:11px;letter-spacing:1.5px;text-transform:uppercase}
 .sub-notice{margin-top:18px;padding:12px 14px;border:1px solid rgba(255,255,255,0.07);border-radius:10px;background:rgba(255,255,255,0.02);font-size:11px;color:rgba(255,255,255,0.3);line-height:1.7;text-align:center}.sub-notice a{color:var(--green);text-decoration:none;font-weight:600}.sub-notice a:hover{opacity:0.75}
 .btn-subscribe-green{display:flex;align-items:center;justify-content:center;width:100%;margin-top:14px;padding:15px;border-radius:11px;border:none;background:var(--green);color:#000;font-family:'Cinzel',serif;font-size:13px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;text-decoration:none;cursor:pointer;position:relative;overflow:hidden;transition:transform 0.25s,box-shadow 0.3s;animation:greenPulse 3s ease-in-out infinite}@keyframes greenPulse{0%,100%{box-shadow:0 4px 20px rgba(0,217,126,0.3)}50%{box-shadow:0 8px 36px rgba(0,217,126,0.55)}}.btn-subscribe-green::before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.22),transparent);transform:translateX(-100%);animation:btnShimmer 2.8s ease-in-out infinite}@keyframes btnShimmer{0%{transform:translateX(-100%)}55%,100%{transform:translateX(120%)}}.btn-subscribe-green:hover{transform:translateY(-2px);box-shadow:0 12px 40px rgba(0,217,126,0.65)}
+.admin{display:none;margin-top:12px;padding-top:12px;border-top:1px solid var(--b)}
+.admin input{margin-bottom:8px}
 </style>
 </head>
 <body>
 <div class="card">
 <a class="back" href="index.html">&#8592; Back</a>
+<a class="admin-link" href="login.html?admin=1">Admin Mode</a>
 <div class="logo">My Fit Journey</div><div class="logo-sub">Member Portal</div>
 <div class="tabs"><button class="tab active" id="t-in" onclick="sw('login')">Sign In</button><button class="tab" id="t-reg" onclick="sw('register')">Create Account</button></div>
 <div id="form-area">
 <label class="lbl">Email Address</label><input type="email" id="email" placeholder="you@example.com" autocomplete="email">
 <label class="lbl">Password</label><input type="password" id="pass" placeholder="Minimum 6 characters" autocomplete="current-password">
-<div class="program-field" id="programField"><label class="lbl">Program</label><select id="program"><option value="shred">4 Weeks 2 Shred</option><option value="strength">Strength Builder</option><option value="bikini">Bikini Program</option></select></div>
+<div class="program-field" id="programField"><label class="lbl">Program</label><select id="program"></select></div>
 <button class="submit" id="sub" onclick="go()">Sign In</button><div id="msg"></div>
+<div class="admin" id="adminBox">
+  <label class="lbl">Admin · Add Program</label>
+  <input id="a-id" placeholder="Program id (example: p4)">
+  <input id="a-name" placeholder="Program name">
+  <input id="a-file" placeholder="File name (example: p4.html)">
+  <button class="submit" type="button" onclick="addProgram()">Add Program</button>
+</div>
 </div>
 <div class="success-wrap" id="success-wrap"><div class="success-icon">&#10003;</div><div class="success-title">Account Created Successfully</div><p class="success-body">Waiting for subscription confirmation.<br><strong>Access granted within 24 hours</strong></p><div class="sub-notice" style="margin-top:16px">A subscription is required to activate your account.</div><a href="https://square.link/u/E4LYxGUQ" target="_blank" class="btn-subscribe-green">Subscribe &mdash; $2 / Week</a></div>
 </div>
@@ -52,6 +64,29 @@ option{background:#161616;color:#fff}.program-field{display:none}
 <script src="shared-api.js"></script>
 <script>
 let tab='login';
+const programSelect = document.getElementById('program');
+async function loadPrograms(){
+  const all = window.getMfjPrograms ? window.getMfjPrograms() : (Array.isArray(window.MFJ_PROGRAMS) ? window.MFJ_PROGRAMS : []);
+  const checks = await Promise.all(all.map(async p=>{
+    if(!p.file) return p;
+    try{ const r=await fetch(p.file,{method:'HEAD'}); return r.ok ? p : null; }catch(_e){ return null; }
+  }));
+  const programs = checks.filter(Boolean);
+  programSelect.innerHTML = programs.map((p,i)=>`<option value="${p.id}" ${i===0?'selected':''}>${p.name}</option>`).join('');
+}
+loadPrograms();
+document.getElementById('adminBox').style.display = location.search.includes('admin=1') ? 'block' : 'none';
+window.addProgram = function(){
+  const id=document.getElementById('a-id').value.trim().toLowerCase();
+  const name=document.getElementById('a-name').value.trim();
+  const file=document.getElementById('a-file').value.trim();
+  if(!id || !name || !file){ setMsg('Fill all admin fields.','error'); return; }
+  let admin=[]; try{ admin=JSON.parse(localStorage.getItem(window.MFJ_PROGRAMS_KEY)||"[]"); }catch(_e){}
+  admin=admin.filter(p=>p.id!==id);
+  admin.push({id,name,sub:'Custom Program',body:'Added from admin tab.',pills:['Custom'],color:'#9ca3af',activeClass:'active-strength',btnClass:'prog-dl-strength',file});
+  localStorage.setItem(window.MFJ_PROGRAMS_KEY,JSON.stringify(admin));
+  location.reload();
+}
 function setMsg(t,c){const el=document.getElementById('msg');el.textContent=t;el.className=c;}
 function reset(){const btn=document.getElementById('sub');btn.disabled=false;btn.textContent=tab==='login'?'Sign In':'Create Account';}
 function sw(t){tab=t;document.getElementById('t-in').classList.toggle('active',t==='login');document.getElementById('t-reg').classList.toggle('active',t==='register');document.getElementById('sub').textContent=t==='login'?'Sign In':'Create Account';document.getElementById('programField').style.display=t==='register'?'block':'none';setMsg('','');}
