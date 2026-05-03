@@ -66,7 +66,13 @@ option{background:#161616;color:#fff}.program-field{display:none}
 let tab='login';
 const programSelect = document.getElementById('program');
 async function loadPrograms(){
-  const all = window.getMfjPrograms ? window.getMfjPrograms() : (Array.isArray(window.MFJ_PROGRAMS) ? window.MFJ_PROGRAMS : []);
+  let remote = [];
+  try{
+    const res = await window.mfjCallApi("listPrograms",{},10000);
+    if(res && res.ok && Array.isArray(res.programs)) remote = res.programs;
+  }catch(_e){}
+  const localAll = window.getMfjPrograms ? window.getMfjPrograms() : (Array.isArray(window.MFJ_PROGRAMS) ? window.MFJ_PROGRAMS : []);
+  const all = [...localAll, ...remote].filter((p,i,a)=>p&&p.id&&a.findIndex(x=>x.id===p.id)===i);
   const checks = await Promise.all(all.map(async p=>{
     if(!p.file) return p;
     try{ const r=await fetch(p.file,{method:'HEAD'}); return r.ok ? p : null; }catch(_e){ return null; }
@@ -76,17 +82,26 @@ async function loadPrograms(){
 }
 loadPrograms();
 document.getElementById('adminBox').style.display = location.search.includes('admin=1') ? 'block' : 'none';
-window.addProgram = function(){
+window.addProgram = async function(){
   const adminPass = window.prompt('Enter admin password to add program:','') || '';
   const id=document.getElementById('a-id').value.trim().toLowerCase();
   const name=document.getElementById('a-name').value.trim();
   const file=document.getElementById('a-file').value.trim();
   if(adminPass !== ['VFC','2026!'].join('')){ setMsg('Invalid admin password.','error'); return; }
   if(!id || !name || !file){ setMsg('Fill all admin fields.','error'); return; }
+  try{
+    const remoteAdd = await window.mfjCallApi("adminAddProgram",{password:adminPass,id,name,file},10000);
+    if(remoteAdd && remoteAdd.ok){
+      setMsg('Program added online successfully.','');
+      setTimeout(()=>location.reload(),600);
+      return;
+    }
+  }catch(_e){}
   let admin=[]; try{ admin=JSON.parse(localStorage.getItem(window.MFJ_PROGRAMS_KEY)||"[]"); }catch(_e){}
   admin=admin.filter(p=>p.id!==id);
   admin.push({id,name,sub:'Custom Program',body:'Added from admin tab.',pills:['Custom'],color:'#9ca3af',activeClass:'active-strength',btnClass:'prog-dl-strength',file});
   localStorage.setItem(window.MFJ_PROGRAMS_KEY,JSON.stringify(admin));
+  setMsg('Added locally (backend not available).','');
   location.reload();
 }
 function setMsg(t,c){const el=document.getElementById('msg');el.textContent=t;el.className=c;}
