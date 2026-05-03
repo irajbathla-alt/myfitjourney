@@ -42,7 +42,12 @@ body{background:#000;color:#fff;font-family:'Inter',sans-serif;-webkit-font-smoo
 .pc.sel .pc-btn{background:#fff;border-color:#fff;color:#000}
 .pc-check{position:absolute;top:12px;right:12px;width:20px;height:20px;border-radius:50%;background:#fff;display:none;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:#000}
 .pc.sel .pc-check{display:flex}
+.pc{opacity:0;transform:translateY(10px) scale(.99);animation:cardIn .45s ease forwards}
+@keyframes cardIn{to{opacity:1;transform:translateY(0) scale(1)}}
 .cs-badge{font-size:10px;color:var(--m);background:rgba(255,255,255,0.04);border:1px solid var(--b);border-radius:7px;padding:5px 10px;font-family:'Inter',sans-serif}
+.tools{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;background:var(--s);border:1px solid var(--b);border-radius:12px;padding:10px 12px;margin-bottom:14px}
+.tool-btn{font-size:11px;font-weight:600;color:var(--m);background:rgba(255,255,255,0.04);border:1px solid var(--b);border-radius:8px;padding:7px 12px;cursor:pointer;transition:all .2s}
+.tool-btn:hover{color:#fff;border-color:var(--b2)}
 .pay{background:var(--s);border:1px solid var(--b);border-radius:18px;overflow:hidden;max-height:0;opacity:0;pointer-events:none;transition:max-height 0.4s ease,opacity 0.35s ease,margin 0.35s ease;margin-top:0}
 .pay.open{max-height:900px;opacity:1;pointer-events:all;margin-top:32px}
 .pay-inner{padding:28px 26px}
@@ -98,35 +103,11 @@ body{background:#000;color:#fff;font-family:'Inter',sans-serif;-webkit-font-smoo
     <p>Select a program, complete payment, and get instant access.</p>
   </div>
   <div class="sec-lbl" id="lbl-live">Available Now</div>
-  <div class="grid" id="live-grid">
-    <div class="pc" id="pc-shred" onclick="sel('shred')">
-      <div class="pc-check">✓</div><div class="pc-line"></div>
-      <div class="pc-body">
-        <div class="pc-icon">🔥</div><div class="pc-name">4-Week Shred</div>
-        <div class="pc-tag">Fat Loss</div>
-        <div class="pc-meta">Intense conditioning. 7 days/week, full body burn.</div>
-        <div class="pc-foot"><div class="pc-price">$49</div><button class="pc-btn">Select</button></div>
-      </div>
-    </div>
-    <div class="pc" id="pc-strength" onclick="sel('strength')">
-      <div class="pc-check">✓</div><div class="pc-line"></div>
-      <div class="pc-body">
-        <div class="pc-icon">💪</div><div class="pc-name">8-Week Strength Builder</div>
-        <div class="pc-tag">Muscle & Power</div>
-        <div class="pc-meta">Progressive overload, compound lifts, size & strength.</div>
-        <div class="pc-foot"><div class="pc-price">$69</div><button class="pc-btn">Select</button></div>
-      </div>
-    </div>
-    <div class="pc" id="pc-bikini" onclick="sel('bikini')">
-      <div class="pc-check">✓</div><div class="pc-line"></div>
-      <div class="pc-body">
-        <div class="pc-icon">🌸</div><div class="pc-name">Bikini Program</div>
-        <div class="pc-tag">Tone & Shape</div>
-        <div class="pc-meta">5-week sculpting program. Shape and tone your body.</div>
-        <div class="pc-foot"><div class="pc-price">$59</div><button class="pc-btn">Select</button></div>
-      </div>
-    </div>
+  <div class="tools">
+    <div style="font-size:11px;color:var(--m)">Programs are now data-driven. Add more in one place below.</div>
+    <button class="tool-btn" id="toggle-cs-btn" onclick="toggleComingSoon()">Show More Coming Soon</button>
   </div>
+  <div class="grid" id="live-grid"></div>
 
   <div class="pay" id="pay-panel">
     <div class="pay-inner">
@@ -156,15 +137,7 @@ body{background:#000;color:#fff;font-family:'Inter',sans-serif;-webkit-font-smoo
   </div>
 
   <div class="sec-lbl" id="lbl-cs" style="margin-top:44px">Coming Soon</div>
-  <div class="grid" id="cs-grid">
-    <div class="pc cs"><div class="pc-line"></div><div class="pc-body"><div class="pc-icon">⚡</div><div class="pc-name">Program 4</div><div class="pc-tag">Uploading Soon</div><div class="pc-meta">Coming soon.</div><div class="pc-foot"><div class="pc-price" style="font-size:13px;color:var(--m)">TBA</div><span class="cs-badge">Coming Soon</span></div></div></div>
-    <div class="pc cs"><div class="pc-line"></div><div class="pc-body"><div class="pc-icon">🔮</div><div class="pc-name">Program 5</div><div class="pc-tag">Uploading Soon</div><div class="pc-meta">Coming soon.</div><div class="pc-foot"><div class="pc-price" style="font-size:13px;color:var(--m)">TBA</div><span class="cs-badge">Coming Soon</span></div></div></div>
-    <div class="pc cs"><div class="pc-line"></div><div class="pc-body"><div class="pc-icon">🌿</div><div class="pc-name">Program 6</div><div class="pc-tag">Uploading Soon</div><div class="pc-meta">Coming soon.</div><div class="pc-foot"><div class="pc-price" style="font-size:13px;color:var(--m)">TBA</div><span class="cs-badge">Coming Soon</span></div></div></div>
-    <div class="pc cs"><div class="pc-line"></div><div class="pc-body"><div class="pc-icon">🏆</div><div class="pc-name">Program 7</div><div class="pc-tag">Uploading Soon</div><div class="pc-meta">Coming soon.</div><div class="pc-foot"><div class="pc-price" style="font-size:13px;color:var(--m)">TBA</div><span class="cs-badge">Coming Soon</span></div></div></div>
-    <div class="pc cs"><div class="pc-line"></div><div class="pc-body"><div class="pc-icon">💎</div><div class="pc-name">Program 8</div><div class="pc-tag">Uploading Soon</div><div class="pc-meta">Coming soon.</div><div class="pc-foot"><div class="pc-price" style="font-size:13px;color:var(--m)">TBA</div><span class="cs-badge">Coming Soon</span></div></div></div>
-    <div class="pc cs"><div class="pc-line"></div><div class="pc-body"><div class="pc-icon">🔑</div><div class="pc-name">Program 9</div><div class="pc-tag">Uploading Soon</div><div class="pc-meta">Coming soon.</div><div class="pc-foot"><div class="pc-price" style="font-size:13px;color:var(--m)">TBA</div><span class="cs-badge">Coming Soon</span></div></div></div>
-    <div class="pc cs"><div class="pc-line"></div><div class="pc-body"><div class="pc-icon">🌺</div><div class="pc-name">Program 10</div><div class="pc-tag">Uploading Soon</div><div class="pc-meta">Coming soon.</div><div class="pc-foot"><div class="pc-price" style="font-size:13px;color:var(--m)">TBA</div><span class="cs-badge">Coming Soon</span></div></div></div>
-  </div>
+  <div class="grid" id="cs-grid"></div>
 
   <div id="suc">
     <div class="suc-ring">✓</div>
@@ -193,21 +166,31 @@ body{background:#000;color:#fff;font-family:'Inter',sans-serif;-webkit-font-smoo
 const SQUARE_APP_ID      = 'sandbox-sq0idb-YOUR_APP_ID_HERE';
 const SQUARE_LOCATION_ID = 'YOUR_LOCATION_ID_HERE';
 
-const PROGS = {
-  shred:    { name:'4-Week Shred',            dur:'4 weeks', price:49, cents:4900 },
-  strength: { name:'8-Week Strength Builder', dur:'8 weeks', price:69, cents:6900 },
-  bikini:   { name:'Bikini Program',          dur:'5 weeks', price:59, cents:5900 },
-  // Uncomment + fill in as you add programs:
-  // p4:  { name:'Program 4', dur:'? weeks', price:0, cents:0 },
-  // p5:  { name:'Program 5', dur:'? weeks', price:0, cents:0 },
-  // p6:  { name:'Program 6', dur:'? weeks', price:0, cents:0 },
-  // p7:  { name:'Program 7', dur:'? weeks', price:0, cents:0 },
-  // p8:  { name:'Program 8', dur:'? weeks', price:0, cents:0 },
-  // p9:  { name:'Program 9', dur:'? weeks', price:0, cents:0 },
-  // p10: { name:'Program 10', dur:'? weeks', price:0, cents:0 },
-};
+const LIVE_PROGRAMS = [
+  { id:'shred', icon:'🔥', name:'4-Week Shred', tag:'Fat Loss', meta:'Intense conditioning. 7 days/week, full body burn.', dur:'4 weeks', price:49, cents:4900 },
+  { id:'strength', icon:'💪', name:'8-Week Strength Builder', tag:'Muscle & Power', meta:'Progressive overload, compound lifts, size & strength.', dur:'8 weeks', price:69, cents:6900 },
+  { id:'bikini', icon:'🌸', name:'Bikini Program', tag:'Tone & Shape', meta:'5-week sculpting program. Shape and tone your body.', dur:'5 weeks', price:59, cents:5900 }
+];
+const COMING_SOON_PROGRAMS = [
+  { icon:'⚡', name:'Program 4' },{ icon:'🔮', name:'Program 5' },{ icon:'🌿', name:'Program 6' },
+  { icon:'🏆', name:'Program 7' },{ icon:'💎', name:'Program 8' },{ icon:'🔑', name:'Program 9' },{ icon:'🌺', name:'Program 10' }
+];
+const PROGS = Object.fromEntries(LIVE_PROGRAMS.map(p=>[p.id,p]));
+let showAllComingSoon=false;
 let selId=null,sqCard=null,sqPay=null;
 window.userEmail='';
+function renderPrograms(){
+  const liveGrid=document.getElementById('live-grid');
+  const csGrid=document.getElementById('cs-grid');
+  liveGrid.innerHTML=LIVE_PROGRAMS.map((p,i)=>`<div class="pc" style="animation-delay:${i*60}ms" id="pc-${p.id}" onclick="sel('${p.id}')"><div class="pc-check">✓</div><div class="pc-line"></div><div class="pc-body"><div class="pc-icon">${p.icon}</div><div class="pc-name">${p.name}</div><div class="pc-tag">${p.tag}</div><div class="pc-meta">${p.meta}</div><div class="pc-foot"><div class="pc-price">$${p.price}</div><button class="pc-btn">Select</button></div></div></div>`).join('');
+  const upcoming=showAllComingSoon?COMING_SOON_PROGRAMS:COMING_SOON_PROGRAMS.slice(0,3);
+  csGrid.innerHTML=upcoming.map((p,i)=>`<div class="pc cs" style="animation-delay:${i*60}ms"><div class="pc-line"></div><div class="pc-body"><div class="pc-icon">${p.icon}</div><div class="pc-name">${p.name}</div><div class="pc-tag">Uploading Soon</div><div class="pc-meta">Coming soon.</div><div class="pc-foot"><div class="pc-price" style="font-size:13px;color:var(--m)">TBA</div><span class="cs-badge">Coming Soon</span></div></div></div>`).join('');
+}
+window.toggleComingSoon=function(){
+  showAllComingSoon=!showAllComingSoon;
+  document.getElementById('toggle-cs-btn').textContent=showAllComingSoon?'Show Fewer Coming Soon':'Show More Coming Soon';
+  renderPrograms();
+}
 async function initSq(){
   if(!window.Square){return}
   try{
@@ -265,6 +248,7 @@ function showSuc(txn){
 function setSt(m,c){const el=document.getElementById('pay-st');el.textContent=m;el.className=c||''}
 window.doOut=function(){};
 initSq();
+renderPrograms();
 </script>
 
 <script type="module">
