@@ -11,7 +11,9 @@ const HEADERS = [
   "UpdatedAt",
   "LastLoginAt",
   "LoginCount",
-  "ProgramUpdatedAt"
+  "ProgramUpdatedAt",
+  "ProgressJSON",
+  "ProgressUpdatedAt"
 ];
 
 function doPost(e) {
@@ -53,6 +55,8 @@ function handleRequest(data) {
   if (action === "login") return loginMember(data);
   if (action === "verify") return verifyMember(data);
   if (action === "update_program") return updateProgram(data);
+  if (action === "save_progress") return saveProgress(data);
+  if (action === "load_progress") return loadProgress(data);
 
   return { ok: false, message: "Invalid action." };
 }
@@ -298,6 +302,55 @@ function getMemberObject(sheet, headers, row) {
     lastLoginAt: formatDate(get("LastLoginAt")),
     loginCount: Number(get("LoginCount") || 0),
     programUpdatedAt: formatDate(get("ProgramUpdatedAt"))
+  };
+}
+
+function saveProgress(data) {
+  const sheet = getSheet();
+  const headers = getHeaders(sheet);
+  const email = normalizeEmail(data.email);
+  const progressJson = String(data.progressJson || "");
+
+  if (!email) return { ok: false, message: "Email is required." };
+  if (!progressJson) return { ok: false, message: "Progress payload is required." };
+
+  const row = findMemberRow(sheet, headers, email);
+  if (!row) return { ok: false, message: "Member not found." };
+
+  const now = new Date();
+  const progressCol = getColumn(headers, "ProgressJSON");
+  const progressUpdatedCol = getColumn(headers, "ProgressUpdatedAt");
+  const updatedAtCol = getColumn(headers, "UpdatedAt");
+
+  if (progressCol > 0) sheet.getRange(row, progressCol).setValue(progressJson);
+  if (progressUpdatedCol > 0) sheet.getRange(row, progressUpdatedCol).setValue(now);
+  if (updatedAtCol > 0) sheet.getRange(row, updatedAtCol).setValue(now);
+
+  return {
+    ok: true,
+    message: "Progress saved.",
+    progressUpdatedAt: formatDate(now)
+  };
+}
+
+function loadProgress(data) {
+  const sheet = getSheet();
+  const headers = getHeaders(sheet);
+  const email = normalizeEmail(data.email);
+  if (!email) return { ok: false, message: "Email is required." };
+
+  const row = findMemberRow(sheet, headers, email);
+  if (!row) return { ok: false, message: "Member not found." };
+
+  const progressCol = getColumn(headers, "ProgressJSON");
+  const progressUpdatedCol = getColumn(headers, "ProgressUpdatedAt");
+  const progressJson = progressCol > 0 ? String(sheet.getRange(row, progressCol).getValue() || "") : "";
+  const progressUpdatedAt = progressUpdatedCol > 0 ? formatDate(sheet.getRange(row, progressUpdatedCol).getValue()) : "";
+
+  return {
+    ok: true,
+    progressJson: progressJson,
+    progressUpdatedAt: progressUpdatedAt
   };
 }
 
