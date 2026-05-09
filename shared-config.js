@@ -15,6 +15,7 @@ window.getMfjPrograms = function(){
 };
 
 (function applyMfjCosmeticPolish(){
+  if (window.MFJ_DISABLE_POLISH) return;
   function ready(fn){
     if(document.readyState === "loading") document.addEventListener("DOMContentLoaded", fn);
     else fn();
