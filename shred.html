@@ -114,6 +114,8 @@ header{position:sticky;top:0;z-index:50;margin:-14px -14px 12px;padding:12px 14p
 </section>
 </div>
 
+<script src="shared-config.js"></script>
+<script src="shared-api.js"></script>
 <script>
 const SPLIT = {"1": {"1": {"title": "Back & Biceps", "morning": [{"name": "AM Cardio", "sets": ["30 min"]}, {"name": "300 Twists", "sets": ["300"]}], "workout": [{"name": "Reverse-Grip Pulldowns", "sets": ["5", "5/10", "5/10/15"]}, {"name": "Neutral-Grip Pulldowns", "sets": ["5", "5/10", "5/10/15"]}, {"name": "Reverse-Grip Machine Rows", "sets": ["5", "5/10", "5/10/15"]}, {"name": "T-Bar Rows", "sets": ["5", "5/10", "5/10/15"]}, {"name": "Machine Preacher Curls", "sets": ["5", "5/10", "5/10/15"]}, {"name": "Biceps Cable Curls", "sets": ["5", "5/10", "5/10/15"]}], "finish": [{"name": "Seated Calf Raises", "sets": ["5", "10", "15"]}, {"name": "Hanging Leg Raises", "sets": ["FAILURE", "FAILURE", "FAILURE"]}, {"name": "Post Cardio", "sets": ["30 min"]}]}, "2": {"title": "Shoulders & Triceps", "morning": [{"name": "AM Cardio", "sets": ["30 min"]}, {"name": "300 Twists", "sets": ["300"]}], "workout": [{"name": "Military Machine Press", "sets": ["5", "5/10", "5/10/15"]}, {"name": "Reverse Pec Deck Flyes", "sets": ["5", "5/10", "5/10/15"]}, {"name": "Machine Lateral Raises", "sets": ["5", "5/10", "5/10/15"]}, {"name": "Machine Shrugs", "sets": ["5", "5/10", "5/10/15"]}, {"name": "Triceps Pressdowns", "sets": ["10", "10/15", "10/15/20"]}, {"name": "Cable Rope Overhead Triceps Extensions", "sets": ["10", "10/15", "10/15/20"]}, {"name": "Close-Grip Chest Press", "sets": ["10", "10/15", "10/15/20"]}], "finish": [{"name": "Post Cardio", "sets": ["30 min"]}]}, "3": {"title": "Active Rest Day", "morning": [{"name": "AM Cardio", "sets": ["40 min"]}, {"name": "300 Twists", "sets": ["300"]}], "workout": [], "finish": [{"name": "PM Cardio", "sets": ["40 min"]}]}, "4": {"title": "Legs", "morning": [{"name": "AM Cardio", "sets": ["30 min"]}, {"name": "300 Twists", "sets": ["300"]}], "workout": [{"name": "Leg Extensions", "sets": ["10", "10/20", "10/20/30"]}, {"name": "Reverse Hack Squats", "sets": ["10", "10/20", "10/20/30"]}, {"name": "Single-Leg Curls", "sets": ["10", "10/20", "10/20/30"]}, {"name": "Hack Squats", "sets": ["10", "10/20", "10/20/30"]}], "finish": [{"name": "Post Cardio", "sets": ["30 min"]}]}, "5": {"title": "Chest & Calves", "morning": [{"name": "AM Cardio", "sets": ["30 min"]}, {"name": "300 Twists", "sets": ["300"]}], "workout": [{"name": "Machine Decline Chest Presses", "sets": ["10", "10/20", "10/20/30"]}, {"name": "Machine Incline Chest Presses", "sets": ["10", "10/20", "10/20/30"]}, {"name": "Machine Crossovers", "sets": ["10", "10/20", "10/20/30"]}, {"name": "Standing Calf Raises", "sets": ["10", "10/20", "10/20/30"]}], "finish": [{"name": "Post Cardio", "sets": ["30 min"]}, {"name": "Decline Sit-Ups", "sets": ["FAILURE", "FAILURE", "FAILURE", "FAILURE", "FAILURE"]}]}, "6": {"title": "Active Rest Day", "morning": [{"name": "AM Cardio", "sets": ["40 min"]}, {"name": "300 Twists", "sets": ["300"]}], "workout": [], "finish": [{"name": "PM Cardio", "sets": ["40 min"]}]}, "7": {"title": "Active Rest Day", "morning": [{"name": "AM Cardio", "sets": ["40 min"]}, {"name": "300 Twists", "sets": ["300"]}], "workout": [], "finish": [{"name": "PM Cardio", "sets": ["40 min"]}]}}, "2": {"1": {"title": "Back & Biceps", "morning": [{"name": "AM Cardio", "sets": ["40 min"]}, {"name": "300 Twists", "sets": ["300"]}], "workout": [{"name": "Machine Low Rows", "sets": ["10", "10", "10/20", "10/20/10"]}, {"name": "Seated Cable Row", "sets": ["10", "10", "10/20", "10/20/10"]}, {"name": "Chest-Supported Dumbbell Rows", "sets": ["10", "10", "10/20", "10/20/10"]}, {"name": "Machine Lat Pulldowns", "sets": ["10", "10", "10/20", "10/20/10"]}, {"name": "Spider Curls", "sets": ["10", "10", "10/20", "10/20/10"]}, {"name": "High-Pulley Cable Curls", "sets": ["10", "10", "10/20", "10/20/10"]}], "finish": [{"name": "Standing Calf Raises", "sets": ["10", "10", "10/20", "10/20/10"]}, {"name": "Hanging Leg Raises", "sets": ["FAILURE", "FAILURE", "FAILURE", "FAILURE"]}, {"name": "Post Cardio", "sets": ["40 min"]}]}, "2": {"title": "Shoulders & Triceps", "morning": [{"name": "AM Cardio", "sets": ["40 min"]}, {"name": "300 Twists", "sets": ["300"]}], "workout": [{"name": "Chest-Support Rear Delt Raises", "sets": ["10", "10", "10/20", "10/20/10"]}, {"name": "Machine Incline Shoulder Presses", "sets": ["10", "10", "10/20", "10/20/10"]}, {"name": "Dumbbell Lateral Raises", "sets": ["10", "10", "10/20", "10/20/10"]}, {"name": "Upright Rows", "sets": ["10", "10", "10/20", "10/20/10"]}, {"name": "Triceps Pressdowns", "sets": ["10", "10", "10/20", "10/20/10"]}, {"name": "Reverse-Grip Triceps Pushdowns", "sets": ["10", "10", "10/20", "10/20/10"]}, {"name": "Cable Lying Triceps Extensions", "sets": ["10", "10", "10/20", "10/20/10"]}], "finish": [{"name": "Post Cardio", "sets": ["40 min"]}]}, "3": {"title": "Active Rest Day", "morning": [{"name": "AM Cardio", "sets": ["45 min"]}, {"name": "300 Twists", "sets": ["300"]}], "workout": [], "finish": [{"name": "PM Cardio", "sets": ["45 min"]}]}, "4": {"title": "Legs", "morning": [{"name": "AM Cardio", "sets": ["40 min"]}, {"name": "300 Twists", "sets": ["300"]}], "workout": [{"name": "Lying Leg Curls", "sets": ["10", "10", "10/20", "10/20/10"]}, {"name": "Leg Extensions", "sets": ["10", "10", "10/20", "10/20/10"]}, {"name": "Leg Presses", "sets": ["10", "10", "10/20", "10/20/10"]}, {"name": "Machine Squat Presses", "sets": ["10", "10", "10/20", "10/20/10"]}], "finish": [{"name": "Post Cardio", "sets": ["40 min"]}]}, "5": {"title": "Chest & Calves", "morning": [{"name": "AM Cardio", "sets": ["40 min"]}, {"name": "300 Twists", "sets": ["300"]}], "workout": [{"name": "Machine Incline Chest Presses", "sets": ["10", "10", "10/20", "10/20/30"]}, {"name": "Machine Flat Bench Presses", "sets": ["10", "10", "10/20", "10/20/30"]}, {"name": "Cable Crossovers", "sets": ["10", "10", "10/20", "10/20/30"]}, {"name": "Lying Calf Raises", "sets": ["10", "10", "10/20", "10/20/10"]}], "finish": [{"name": "Post Cardio", "sets": ["40 min"]}, {"name": "Crunches", "sets": ["FAILURE", "FAILURE", "FAILURE", "FAILURE", "FAILURE"]}]}, "6": {"title": "Active Rest Day", "morning": [{"name": "AM Cardio", "sets": ["45 min"]}, {"name": "300 Twists", "sets": ["300"]}], "workout": [], "finish": [{"name": "PM Cardio", "sets": ["45 min"]}]}, "7": {"title": "Active Rest Day", "morning": [{"name": "AM Cardio", "sets": ["45 min"]}, {"name": "300 Twists", "sets": ["300"]}], "workout": [], "finish": [{"name": "PM Cardio", "sets": ["45 min"]}]}}, "3": {"1": {"title": "Back & Biceps", "morning": [{"name": "AM Cardio", "sets": ["40 min"]}, {"name": "300 Twists", "sets": ["300"]}], "workout": [{"name": "Machine High Rows", "sets": ["10", "10/10", "10/20/10"]}, {"name": "Reverse-Grip Lat Pulldowns", "sets": ["10", "10/10", "10/20/10"]}, {"name": "Machine Rows", "sets": ["10", "10/10", "10/20/10"]}, {"name": "Hyperextensions", "sets": ["10", "10/10", "10/20/10"]}, {"name": "Machine Preacher Curls", "sets": ["10", "10/10", "10/20/10"]}, {"name": "Barbell Curls", "sets": ["10", "10/10", "10/20/10"]}], "finish": [{"name": "Seated Calf Raises", "sets": ["10", "10/10", "10/20/10"]}, {"name": "Lying Leg Raises", "sets": ["FAILURE", "FAILURE", "FAILURE"]}, {"name": "Post Cardio", "sets": ["40 min"]}]}, "2": {"title": "Shoulders & Triceps", "morning": [{"name": "AM Cardio", "sets": ["45 min"]}, {"name": "300 Twists", "sets": ["300"]}], "workout": [{"name": "Seated Front Dumbbell Raises", "sets": ["10", "10/20", "10/20/10"]}, {"name": "Dumbbell Lateral Raises", "sets": ["10", "10/20", "10/20/10"]}, {"name": "Cable Rear Delt Flyes", "sets": ["10", "10/20", "10/20/10"]}, {"name": "Dumbbell Shrugs", "sets": ["10", "10/20", "10/20/10"]}, {"name": "Triceps Pressdowns", "sets": ["10", "10/20", "10/20/10"]}, {"name": "Cable One-Arm Triceps Extensions", "sets": ["10", "10/20", "10/20/10"]}, {"name": "Seated Triceps Pushdowns", "sets": ["10", "10/20", "10/20/10"]}], "finish": [{"name": "Post Cardio", "sets": ["45 min"]}]}, "3": {"title": "Active Rest Day", "morning": [{"name": "AM Cardio", "sets": ["50 min"]}, {"name": "300 Twists", "sets": ["300"]}], "workout": [], "finish": [{"name": "PM Cardio", "sets": ["50 min"]}]}, "4": {"title": "Legs", "morning": [{"name": "AM Cardio", "sets": ["45 min"]}, {"name": "300 Twists", "sets": ["300"]}], "workout": [{"name": "Leg Extensions", "sets": ["10", "10/10", "10/20/10"]}, {"name": "Machine Squat Presses", "sets": ["10", "10/10", "10/20/10"]}, {"name": "Lying Leg Curls", "sets": ["10", "10/10", "10/20/10"]}, {"name": "Leg Presses", "sets": ["10", "10/10", "10/20/10"]}], "finish": [{"name": "Post Cardio", "sets": ["45 min"]}]}, "5": {"title": "Chest, Calves & Abs", "morning": [{"name": "AM Cardio", "sets": ["45 min"]}, {"name": "300 Twists", "sets": ["300"]}], "workout": [{"name": "Pec Deck Flyes", "sets": ["10", "10/10", "10/20/10"]}, {"name": "Decline Dumbbell Flyes", "sets": ["10", "10/10", "10/20/10"]}, {"name": "Incline Cable Flyes", "sets": ["10", "10/10", "10/20/10"]}, {"name": "Standing Calf Raises", "sets": ["10", "10/10", "10/20/10"]}], "finish": [{"name": "Post Cardio", "sets": ["45 min"]}, {"name": "Exercise Ball Crunches", "sets": ["FAILURE", "FAILURE", "FAILURE", "FAILURE"]}]}, "6": {"title": "Active Rest Day", "morning": [{"name": "AM Cardio", "sets": ["50 min"]}, {"name": "300 Twists", "sets": ["300"]}], "workout": [], "finish": [{"name": "PM Cardio", "sets": ["50 min"]}]}, "7": {"title": "Active Rest Day", "morning": [{"name": "AM Cardio", "sets": ["50 min"]}, {"name": "300 Twists", "sets": ["300"]}], "workout": [], "finish": [{"name": "PM Cardio", "sets": ["50 min"]}]}}, "4": {"1": {"title": "Back & Biceps", "morning": [{"name": "AM Cardio", "sets": ["50 min"]}, {"name": "Twists", "sets": ["300"]}], "workout": [{"name": "Machine Low Rows", "sets": ["5", "5/10", "5/10/15"]}, {"name": "Lat Pulldowns", "sets": ["5", "5/10", "5/10/15"]}, {"name": "Machine High Rows", "sets": ["5", "5/10", "5/10/15"]}, {"name": "Preacher Curls", "sets": ["5", "5/10", "5/10/15"]}, {"name": "Cable Curls", "sets": ["5", "5/10", "5/10/15"]}], "finish": [{"name": "Post Cardio", "sets": ["50 min"]}]}, "2": {"title": "Shoulders & Triceps", "morning": [{"name": "AM Cardio", "sets": ["50 min"]}, {"name": "Twists", "sets": ["300"]}], "workout": [{"name": "Rear Delt Raises", "sets": ["5", "5/10", "5/10/15"]}, {"name": "Lateral Raises", "sets": ["5", "5/10", "5/10/15"]}, {"name": "Machine Shrugs", "sets": ["5", "5/10", "5/10/15"]}, {"name": "Triceps Pressdowns", "sets": ["5", "5/10", "5/10/15"]}, {"name": "Overhead Triceps Extensions", "sets": ["5", "5/10", "5/10/15"]}], "finish": [{"name": "Calf Raises", "sets": ["5", "5/10", "5/10/15"]}, {"name": "Weighted Sit-Ups", "sets": ["FAILURE", "FAILURE", "FAILURE"]}]}, "3": {"title": "Active Rest", "morning": [{"name": "AM Cardio", "sets": ["60 min"]}, {"name": "Twists", "sets": ["300"]}], "workout": [], "finish": [{"name": "PM Cardio", "sets": ["60 min"]}]}, "4": {"title": "Legs", "morning": [{"name": "AM Cardio", "sets": ["45 min"]}, {"name": "Twists", "sets": ["300"]}], "workout": [{"name": "Leg Extensions", "sets": ["5", "5/10", "5/10/15"]}, {"name": "Hack Squats", "sets": ["5", "5/10", "5/10/15"]}, {"name": "Seated Leg Curls", "sets": ["5", "5/10", "5/10/15"]}, {"name": "Single-Leg Curls", "sets": ["5", "5/10", "5/10/15"]}], "finish": [{"name": "Post Cardio", "sets": ["45 min"]}]}, "5": {"title": "Chest & Calves", "morning": [{"name": "AM Cardio", "sets": ["50 min"]}, {"name": "Twists", "sets": ["300"]}], "workout": [{"name": "Machine Chest Press", "sets": ["5", "5/10", "5/10/15"]}, {"name": "Incline Chest Press", "sets": ["5", "5/10", "5/10/15"]}, {"name": "Cable Crossovers", "sets": ["5", "5/10", "5/10/15"]}, {"name": "Calf Press", "sets": ["5", "5/10", "5/10/15"]}], "finish": [{"name": "Post Cardio", "sets": ["50 min"]}]}, "6": {"title": "Active Rest", "morning": [{"name": "AM Cardio", "sets": ["55 min"]}, {"name": "Twists", "sets": ["300"]}], "workout": [], "finish": [{"name": "PM Cardio", "sets": ["55 min"]}]}, "7": {"title": "Final Burn", "morning": [{"name": "AM Cardio", "sets": ["55 min"]}, {"name": "Twists", "sets": ["300"]}], "workout": [], "finish": [{"name": "PM Cardio", "sets": ["55 min"]}]}}};
 
@@ -163,27 +165,64 @@ const BACKUP_KEY  = "JFC_4WEEKS_BACKUP_V3";
 function loadState() {
   try {
     let data = localStorage.getItem(STORAGE_KEY);
-    if (!data) {
-      data = localStorage.getItem(BACKUP_KEY);
-    }
-    if (!data) {
-      return { week: 1, day: 1, checks: {} };
-    }
+    if (!data) data = localStorage.getItem(BACKUP_KEY);
+    if (!data) return { week: 1, day: 1, checks: {} };
     return JSON.parse(data);
-  } catch (err) {
+  } catch (_err) {
     return { week: 1, day: 1, checks: {} };
   }
 }
 
 let state = loadState();
+let syncTimer = null;
+let syncInFlight = false;
 
-function saveState() {
+function persistLocalState() {
   try {
     const json = JSON.stringify(state);
     localStorage.setItem(STORAGE_KEY, json);
     localStorage.setItem(BACKUP_KEY, json);
-  } catch (err) {
+  } catch (_err) {
     console.log("Storage failed.");
+  }
+}
+
+async function saveStateToCloud() {
+  if (syncInFlight) return;
+  const memberEmail = (sessionStorage.getItem("mfj_last_email") || localStorage.getItem("mfj_last_email") || "").trim().toLowerCase();
+  if (!memberEmail || typeof window.mfjCallApi !== "function") return;
+  syncInFlight = true;
+  try {
+    await window.mfjCallApi("save_progress", { email: memberEmail, progressJson: JSON.stringify(state) }, 8000);
+  } catch (_err) {
+    // Keep local state even if cloud sync fails.
+  } finally {
+    syncInFlight = false;
+  }
+}
+
+function saveState() {
+  persistLocalState();
+  if (syncTimer) clearTimeout(syncTimer);
+  syncTimer = setTimeout(saveStateToCloud, 500);
+}
+
+async function initCloudState() {
+  const memberEmail = (sessionStorage.getItem("mfj_last_email") || localStorage.getItem("mfj_last_email") || "").trim().toLowerCase();
+  if (!memberEmail || typeof window.mfjCallApi !== "function") return;
+  try {
+    const res = await window.mfjCallApi("load_progress", { email: memberEmail }, 8000);
+    if (res && res.ok && res.progressJson) {
+      const remoteState = JSON.parse(res.progressJson);
+      if (remoteState && typeof remoteState === "object") {
+        state = remoteState;
+        persistLocalState();
+      }
+    } else {
+      await saveStateToCloud();
+    }
+  } catch (_err) {
+    // Local fallback is already loaded.
   }
 }
 
@@ -293,9 +332,8 @@ document.getElementById("markAllBtn").addEventListener("click",()=>{
   renderProgress(plan);
 });
 
-renderPlan();
+initCloudState().finally(renderPlan);
 </script>
-
 <script>
 const memberEmail=(sessionStorage.getItem("mfj_last_email")||localStorage.getItem("mfj_last_email")||"").trim().toLowerCase();
 if(!memberEmail){

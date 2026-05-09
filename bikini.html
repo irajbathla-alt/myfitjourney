@@ -137,6 +137,9 @@ header{position:sticky;top:0;z-index:50;margin:-14px -14px 12px;padding:12px 14p
 </section>
 </div>
 
+<script>window.MFJ_DISABLE_POLISH = true;</script>
+<script src="shared-config.js"></script>
+<script src="shared-api.js"></script>
 <script>
 
 const SPLIT = {
@@ -2170,27 +2173,64 @@ const BACKUP_KEY  = "JFC_STRENGTH_WEEK1_BACKUP_V2";
 function loadState() {
   try {
     let data = localStorage.getItem(STORAGE_KEY);
-    if (!data) {
-      data = localStorage.getItem(BACKUP_KEY);
-    }
-    if (!data) {
-      return { week: 1, day: 1, checks: {} };
-    }
+    if (!data) data = localStorage.getItem(BACKUP_KEY);
+    if (!data) return { week: 1, day: 1, checks: {} };
     return JSON.parse(data);
-  } catch (err) {
+  } catch (_err) {
     return { week: 1, day: 1, checks: {} };
   }
 }
 
 let state = loadState();
+let syncTimer = null;
+let syncInFlight = false;
 
-function saveState() {
+function persistLocalState() {
   try {
     const json = JSON.stringify(state);
     localStorage.setItem(STORAGE_KEY, json);
     localStorage.setItem(BACKUP_KEY, json);
-  } catch (err) {
+  } catch (_err) {
     console.log("Storage failed.");
+  }
+}
+
+async function saveStateToCloud() {
+  if (syncInFlight) return;
+  const memberEmail = (sessionStorage.getItem("mfj_last_email") || localStorage.getItem("mfj_last_email") || "").trim().toLowerCase();
+  if (!memberEmail || typeof window.mfjCallApi !== "function") return;
+  syncInFlight = true;
+  try {
+    await window.mfjCallApi("save_progress", { email: memberEmail, progressJson: JSON.stringify(state) }, 8000);
+  } catch (_err) {
+    // Keep local state even if cloud sync fails.
+  } finally {
+    syncInFlight = false;
+  }
+}
+
+function saveState() {
+  persistLocalState();
+  if (syncTimer) clearTimeout(syncTimer);
+  syncTimer = setTimeout(saveStateToCloud, 500);
+}
+
+async function initCloudState() {
+  const memberEmail = (sessionStorage.getItem("mfj_last_email") || localStorage.getItem("mfj_last_email") || "").trim().toLowerCase();
+  if (!memberEmail || typeof window.mfjCallApi !== "function") return;
+  try {
+    const res = await window.mfjCallApi("load_progress", { email: memberEmail }, 8000);
+    if (res && res.ok && res.progressJson) {
+      const remoteState = JSON.parse(res.progressJson);
+      if (remoteState && typeof remoteState === "object") {
+        state = remoteState;
+        persistLocalState();
+      }
+    } else {
+      await saveStateToCloud();
+    }
+  } catch (_err) {
+    // Local fallback is already loaded.
   }
 }
 
@@ -2300,7 +2340,7 @@ document.getElementById("markAllBtn").addEventListener("click",()=>{
   renderProgress(plan);
 });
 
-renderPlan();
+initCloudState().finally(renderPlan);
 </script>
 
 
@@ -2314,6 +2354,13 @@ document.addEventListener("click", function(e){
     }
   }
 });
+</script>
+
+<script>
+const memberEmail=(sessionStorage.getItem("mfj_last_email")||localStorage.getItem("mfj_last_email")||"").trim().toLowerCase();
+if(!memberEmail){
+  window.location.href="login.html";
+}
 </script>
 
 </body>
