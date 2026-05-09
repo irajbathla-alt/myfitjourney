@@ -826,30 +826,51 @@ const BACKUP_KEY  = "JFC_STRENGTH_WEEK1_BACKUP_V2";
 function loadState() {
   try {
     let data = localStorage.getItem(STORAGE_KEY);
-    if (!data) {
-      data = localStorage.getItem(BACKUP_KEY);
-    }
-    if (!data) {
-      return { week: 1, day: 1, checks: {} };
-    }
+    if (!data) data = localStorage.getItem(BACKUP_KEY);
+    if (!data) return { week: 1, day: 1, checks: {} };
     return JSON.parse(data);
-  } catch (err) {
+  } catch (_err) {
     return { week: 1, day: 1, checks: {} };
   }
 }
 
 let state = loadState();
+let syncTimer = null;
+let syncInFlight = false;
 
-function saveState() {
+function persistLocalState() {
   try {
     const json = JSON.stringify(state);
     localStorage.setItem(STORAGE_KEY, json);
     localStorage.setItem(BACKUP_KEY, json);
-  } catch (err) {
+  } catch (_err) {
     console.log("Storage failed.");
   }
 }
 
+async function saveStateToCloud() {
+  if (syncInFlight) return;
+  const memberEmail = (sessionStorage.getItem("mfj_last_email") || localStorage.getItem("mfj_last_email") || "").trim().toLowerCase();
+  if (!memberEmail || typeof window.mfjCallApi !== "function") return;
+  syncInFlight = true;
+  try { await window.mfjCallApi("save_progress", { email: memberEmail, progressJson: JSON.stringify(state) }, 8000); } catch (_err) {} finally { syncInFlight = false; }
+}
+
+function saveState() {
+  persistLocalState();
+  if (syncTimer) clearTimeout(syncTimer);
+  syncTimer = setTimeout(saveStateToCloud, 500);
+}
+
+async function initCloudState() {
+  const memberEmail = (sessionStorage.getItem("mfj_last_email") || localStorage.getItem("mfj_last_email") || "").trim().toLowerCase();
+  if (!memberEmail || typeof window.mfjCallApi !== "function") return;
+  try {
+    const res = await window.mfjCallApi("load_progress", { email: memberEmail }, 8000);
+    if (res && res.ok && res.progressJson) { state = JSON.parse(res.progressJson); persistLocalState(); }
+    else { await saveStateToCloud(); }
+  } catch (_err) {}
+}
 
 const content=document.getElementById("content");
 const metaWeek=document.getElementById("metaWeek");
@@ -937,18 +958,10 @@ function renderPlan(){
 
 
 
-weekSelect.addEventListener("change", ()=>{ state.week = Number(weekSelect.value); saveState(); 
-// Proper initialization from saved state
 weekSelect.value = String(state.week);
 daySelect.value = String(state.day);
-
-renderPlan(); window.scrollTo({top:0,behavior:"smooth"}); });
-daySelect.addEventListener("change", ()=>{ state.day = Number(daySelect.value); saveState(); 
-// Proper initialization from saved state
-weekSelect.value = String(state.week);
-daySelect.value = String(state.day);
-
-renderPlan(); window.scrollTo({top:0,behavior:"smooth"}); });
+weekSelect.addEventListener("change", ()=>{ state.week = Number(weekSelect.value); saveState(); renderPlan(); window.scrollTo({top:0,behavior:"smooth"}); });
+daySelect.addEventListener("change", ()=>{ state.day = Number(daySelect.value); saveState(); renderPlan(); window.scrollTo({top:0,behavior:"smooth"}); });
 
 document.getElementById("resetBtn").addEventListener("click",()=>{
   const plan = (SPLIT[String(state.week)]||{})[String(state.day)];
@@ -972,7 +985,7 @@ document.getElementById("markAllBtn").addEventListener("click",()=>{
 weekSelect.value = String(state.week);
 daySelect.value = String(state.day);
 
-renderPlan();
+initCloudState().finally(renderPlan);
 </script>
 
 <script>
