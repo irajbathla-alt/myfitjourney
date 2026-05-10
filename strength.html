@@ -88,7 +88,6 @@ header.compact{padding:8px 14px 8px;background:linear-gradient(to bottom, rgba(1
   <div class="brand">
     <h1>My Fit Journey</h1>
     <p class="sub">Strength Builder • 8 Weeks • Progress Saved ✓</p>
-    <div class="statusRow"><span class="statusPill sync" id="syncPill">Synced just now</span><span class="statusPill" id="stampPill">Updated —</span><span class="statusPill">MFJ</span></div>
   </div>
   <div class="topRow">
     <div class="meta">
@@ -912,8 +911,6 @@ const progressDone=document.getElementById("progressDone");
 const progressTotal=document.getElementById("progressTotal");
 const nowBadge=document.getElementById("nowBadge");
 const paceBadge=document.getElementById("paceBadge");
-const syncPill=document.getElementById("syncPill");
-const stampPill=document.getElementById("stampPill");
 const themeSelect=document.getElementById("themeSelect");
 const toast=document.getElementById("toast");
 const toastText=document.getElementById("toastText");
@@ -940,6 +937,9 @@ function section(week,day,title,items,hint,activeName,nextName){
   }).join("");
 }
 function updateTrustStatus(mode="synced"){
+  const syncPill=document.getElementById("syncPill");
+  const stampPill=document.getElementById("stampPill");
+  if(!syncPill || !stampPill) return;
   const t=new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
   stampPill.textContent=`Updated ${t}`;
   syncPill.textContent = mode==="offline" ? "Offline — local only" : "Synced just now";
