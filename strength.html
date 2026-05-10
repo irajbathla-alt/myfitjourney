@@ -912,20 +912,20 @@ let undoSnapshot=null;
 let toastTimer=null;
 let lastPct=0;
 
-function keyFor(week,day,name,idx){return `w${week}|d${day}|${name}|${idx}`;}
+function keyFor(week,day,uid,idx){return `w${week}|d${day}|${uid}|${idx}`;}
 
-function chipHTML(week,day,name,i,label){
-  const k=keyFor(week,day,name,i);
+function chipHTML(week,day,uid,i,label){
+  const k=keyFor(week,day,uid,i);
   const checked=!!state.checks[k];
   return `<div class="chip ${checked?"checked":""}" data-key="${k}"><span class="dot"></span><span>${safe(label)}</span></div>`;
 }
 function card(week,day,item,stateClass){
-  const chips=(item.sets||[]).map((s,i)=>chipHTML(week,day,item.name,i,`Set ${i+1}: ${s}`)).join("");
+  const chips=(item.sets||[]).map((s,i)=>chipHTML(week,day,item.uid,i,`Set ${i+1}: ${s}`)).join("");
   return `<div class="card ${stateClass||""}"><div class="cardInner"><div class="thumb">${svgIcon(item.name)}<div class="shine"></div></div><div class="info"><p class="name">${safe(item.name)}</p><p class="detail">${safe((item.sets||[]).join(" • "))}</p><div class="sets">${chips}</div></div></div></div>`;
 }
 function section(week,day,title,items,hint,activeName,nextName){
   return `<div class="sectionTitle"><span>${title}</span><small>${hint||""}</small></div>` + items.map(it=>{
-    const cls = it.name===activeName ? "active" : it.name===nextName ? "next" : ((it.sets||[]).every((_,i)=>!!state.checks[keyFor(week,day,it.name,i)]) ? "done" : "");
+    const cls = it.uid===activeName ? "active" : it.uid===nextName ? "next" : ((it.sets||[]).every((_,i)=>!!state.checks[keyFor(week,day,it.uid,i)]) ? "done" : "");
     return card(week,day,it,cls);
   }).join("");
 }
@@ -936,7 +936,7 @@ function showToast(msg, onUndo){
 }
 function allKeysForDay(week,day,plan){
   const keys=[];
-  [plan.morning,plan.workout,plan.finish].flat().forEach(item=> (item.sets||[]).forEach((_,i)=>keys.push(keyFor(week,day,item.name,i)) ));
+  [plan.morning,plan.workout,plan.finish].flat().forEach(item=> (item.sets||[]).forEach((_,i)=>keys.push(keyFor(week,day,item.uid,i)) ));
   return keys;
 }
 function renderProgress(plan){
@@ -971,16 +971,16 @@ function renderPlan(){
   }
   panelTitle.textContent=`Week ${state.week} • Day ${state.day}`;
 
-  const morning=plan.morning||[];
-  const workout=plan.workout||[];
-  const finish=plan.finish||[];
-  const activeItem = workout.find(item => (item.sets||[]).some((_,i)=>!state.checks[keyFor(state.week,state.day,item.name,i)])) || workout[0] || morning[0] || finish[0];
-  const nextItem = workout.find(item => item!==activeItem && (item.sets||[]).some((_,i)=>!state.checks[keyFor(state.week,state.day,item.name,i)]));
+  const morning=(plan.morning||[]).map((item,idx)=>({...item,uid:`m-${idx}-${item.name}`}));
+  const workout=(plan.workout||[]).map((item,idx)=>({...item,uid:`w-${idx}-${item.name}`}));
+  const finish=(plan.finish||[]).map((item,idx)=>({...item,uid:`f-${idx}-${item.name}`}));
+  const activeItem = workout.find(item => (item.sets||[]).some((_,i)=>!state.checks[keyFor(state.week,state.day,item.uid,i)])) || workout[0] || morning[0] || finish[0];
+  const nextItem = workout.find(item => item!==activeItem && (item.sets||[]).some((_,i)=>!state.checks[keyFor(state.week,state.day,item.uid,i)]));
 
   let out="";
-  if(morning.length) out += section(state.week,state.day,"Morning",morning,"start smooth", activeItem && activeItem.name, nextItem && nextItem.name);
-  out += workout.length ? section(state.week,state.day,"Workout",workout,"push hard", activeItem && activeItem.name, nextItem && nextItem.name) : (`<div class="sectionTitle"><span>Workout</span><small>rest</small></div><div class="empty">No weights today — active rest.</div>`);
-  if(finish.length) out += section(state.week,state.day,"Finish",finish,"clean close", activeItem && activeItem.name, nextItem && nextItem.name);
+  if(morning.length) out += section(state.week,state.day,"Morning",morning,"start smooth", activeItem && activeItem.uid, nextItem && nextItem.uid);
+  out += workout.length ? section(state.week,state.day,"Workout",workout,"push hard", activeItem && activeItem.uid, nextItem && nextItem.uid) : (`<div class="sectionTitle"><span>Workout</span><small>rest</small></div><div class="empty">No weights today — active rest.</div>`);
+  if(finish.length) out += section(state.week,state.day,"Finish",finish,"clean close", activeItem && activeItem.uid, nextItem && nextItem.uid);
   content.innerHTML=out;
 
   content.onclick=(e)=>{
