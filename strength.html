@@ -130,6 +130,7 @@ header.compact .brand .sub{opacity:.55}
         <option value="5">5</option><option value="6">6</option><option value="7">7</option>
       </select></div>
     </label>
+    <div class="pill" id="exerciseDateTab"><span class="dot"></span><span>Exercise: — (W1 • D1)</span></div>
     <button class="btn ghost" id="resetBtn">Reset Day</button>
     <button class="btn primary" id="markAllBtn">Mark All</button>
   </div>
@@ -900,6 +901,7 @@ const toast=document.getElementById("toast");
 const toastText=document.getElementById("toastText");
 const undoBtn=document.getElementById("undoBtn");
 const progressWrap=document.querySelector(".progressWrap");
+const exerciseDateTab=document.getElementById("exerciseDateTab");
 const weekSelect=document.getElementById("weekSelect");
 const daySelect=document.getElementById("daySelect");
 let undoSnapshot=null;
@@ -955,6 +957,7 @@ function renderPlan(){
   const plan = (SPLIT[week]||{})[day];
   if(!plan){
     panelTitle.textContent=`Week ${state.week} • Day ${state.day}`;
+    exerciseDateTab.querySelector("span:last-child").textContent=`Exercise: — (W${state.week} • D${state.day})`;
     content.innerHTML = `<div class="empty">No workout data found for Week ${state.week} Day ${state.day}.</div>`;
     barFill.style.width="0%"; progressPct.textContent="0%"; progressDone.textContent="0"; progressTotal.textContent="0";
     return;
@@ -966,6 +969,7 @@ function renderPlan(){
   const finish=(plan.finish||[]).map((item,idx)=>({...item,uid:`f-${idx}-${item.name}`}));
   const activeItem = workout.find(item => (item.sets||[]).some((_,i)=>!state.checks[keyFor(state.week,state.day,item.uid,i)])) || workout[0] || morning[0] || finish[0];
   const nextItem = workout.find(item => item!==activeItem && (item.sets||[]).some((_,i)=>!state.checks[keyFor(state.week,state.day,item.uid,i)]));
+  exerciseDateTab.querySelector("span:last-child").textContent=`Exercise: ${activeItem ? activeItem.name : "Recovery"} (W${state.week} • D${state.day})`;
 
   let out="";
   if(morning.length) out += section(state.week,state.day,"Morning",morning,"start smooth", activeItem && activeItem.uid, nextItem && nextItem.uid);
