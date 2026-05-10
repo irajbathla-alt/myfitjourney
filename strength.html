@@ -929,15 +929,6 @@ function section(week,day,title,items,hint,activeName,nextName){
     return card(week,day,it,cls);
   }).join("");
 }
-function updateTrustStatus(mode="synced"){
-  const syncPill=document.getElementById("syncPill");
-  const stampPill=document.getElementById("stampPill");
-  if(!syncPill || !stampPill) return;
-  const t=new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
-  stampPill.textContent=`Updated ${t}`;
-  syncPill.textContent = mode==="offline" ? "Offline — local only" : "Synced just now";
-  syncPill.classList.toggle("offline", mode==="offline");
-}
 function showToast(msg, onUndo){
   toastText.textContent=msg; toast.classList.add("show"); undoSnapshot=onUndo;
   if(toastTimer) clearTimeout(toastTimer);
