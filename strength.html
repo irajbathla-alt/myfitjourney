@@ -13,6 +13,8 @@ body{margin:0;font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,
 @keyframes fadeIn{from{opacity:.7;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
 header{position:sticky;top:0;z-index:50;margin:-14px -14px 12px;padding:12px 14px 12px;backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);background:linear-gradient(to bottom, rgba(11,11,12,.94), rgba(11,11,12,.62), rgba(11,11,12,.06));border-bottom:1px solid rgba(255,255,255,.08);transition:padding var(--dur-med) var(--ease-standard),background var(--dur-med) var(--ease-standard);}
 header.compact{padding:8px 14px 8px;background:linear-gradient(to bottom, rgba(11,11,12,.98), rgba(11,11,12,.78));}
+header.compact .brand h1{font-size:25px;transform:translateY(-1px)}
+header.compact .brand .sub{opacity:.55}
 .brand{display:flex;flex-direction:column;align-items:center;gap:6px;padding:6px 0 10px;}
 .brand h1{margin:0;font-size:30px;line-height:1.05;letter-spacing:.3px;font-weight:700;font-family:"Brush Script MT","Segoe Script","Lucida Handwriting","Apple Chancery",cursive;text-transform:none;text-align:center;text-shadow:0 6px 22px rgba(255,255,255,.10);} 
 .brand .sub{margin:0;font-size:12px;color:var(--muted);text-align:center;}
@@ -68,16 +70,22 @@ header.compact{padding:8px 14px 8px;background:linear-gradient(to bottom, rgba(1
 .chip.checked .dot{background:var(--good);border-color:rgba(255,255,255,.55);box-shadow:0 0 0 3px rgba(124,252,154,.14);}
 .progressWrap{padding:12px 14px 14px;border-top:1px solid rgba(255,255,255,.06);background:linear-gradient(180deg, rgba(0,0,0,.12), rgba(0,0,0,.24));position:sticky;bottom:0;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);}
 .bar{width:100%;height:10px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.10);border-radius:999px;overflow:hidden;}
-.bar>div{height:100%;width:0%;background:linear-gradient(90deg, rgba(255,255,255,.48), rgba(255,255,255,.95), rgba(255,255,255,.6));background-size:180% 100%;border-radius:999px;transition:width .25s ease;animation:progressShine 2.2s linear infinite;}
+.bar>div{height:100%;width:0%;background:linear-gradient(90deg, rgba(255,255,255,.48), rgba(255,255,255,.95), rgba(255,255,255,.6));background-size:180% 100%;border-radius:999px;transition:width .25s ease;animation:none;}
+.bar>div.shine{animation:progressShine 1.2s linear 1;}
+.progressWrap.milestone{box-shadow:0 -1px 0 rgba(255,255,255,.22),0 -8px 24px rgba(199,210,255,.18)}
+.statusPill.pulse{animation:pop .28s ease}
 .progressMeta{display:flex;justify-content:space-between;align-items:center;margin-top:8px;font-size:12px;color:var(--muted);gap:10px;flex-wrap:wrap;}
 .progressMeta b{color:var(--text)}
 .empty{padding:14px;border:1px dashed rgba(255,255,255,.14);border-radius:var(--r1);background:rgba(255,255,255,.03);color:var(--muted);font-size:13px;line-height:1.4;}
-.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:22px;z-index:80;background:rgba(10,10,12,.95);border:1px solid rgba(255,255,255,.2);padding:10px 12px;border-radius:12px;font-size:12px;display:none;gap:10px;align-items:center}
-.toast.show{display:flex}
+.toast{position:fixed;left:50%;transform:translateX(-50%) translateY(10px);bottom:22px;z-index:80;background:rgba(10,10,12,.95);border:1px solid rgba(255,255,255,.2);padding:10px 12px;border-radius:12px;font-size:12px;display:flex;gap:10px;align-items:center;opacity:0;pointer-events:none;transition:opacity var(--dur-med) var(--ease-standard),transform var(--dur-med) var(--ease-standard)}
+.toast::before{content:"";position:absolute;left:0;bottom:0;height:2px;width:100%;background:var(--accent);transform-origin:left center;transform:scaleX(0)}
+.toast.show{opacity:1;pointer-events:auto;transform:translateX(-50%) translateY(0)}
+.toast.show::before{animation:toastTimer 4.5s linear 1}
 .toast button{all:unset;cursor:pointer;color:var(--accent);font-weight:900}
 @keyframes cardIn{from{opacity:0;transform:translateY(8px) scale(.985)}to{opacity:1;transform:translateY(0) scale(1)}}
 @keyframes pop{0%{transform:scale(.96)}70%{transform:scale(1.04)}100%{transform:scale(1)}}
 @keyframes progressShine{0%{background-position:0% 0}100%{background-position:180% 0}}
+@keyframes toastTimer{from{transform:scaleX(1)}to{transform:scaleX(0)}}
 @media (max-width:380px){.thumb{width:72px;height:72px}.brand h1{font-size:26px}.actions{gap:6px}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
@@ -915,9 +923,12 @@ const themeSelect=document.getElementById("themeSelect");
 const toast=document.getElementById("toast");
 const toastText=document.getElementById("toastText");
 const undoBtn=document.getElementById("undoBtn");
+const progressWrap=document.querySelector(".progressWrap");
 const weekSelect=document.getElementById("weekSelect");
 const daySelect=document.getElementById("daySelect");
 let undoSnapshot=null;
+let toastTimer=null;
+let lastPct=0;
 
 function keyFor(week,day,name,idx){return `w${week}|d${day}|${name}|${idx}`;}
 
@@ -947,7 +958,8 @@ function updateTrustStatus(mode="synced"){
 }
 function showToast(msg, onUndo){
   toastText.textContent=msg; toast.classList.add("show"); undoSnapshot=onUndo;
-  setTimeout(()=>toast.classList.remove("show"), 4500);
+  if(toastTimer) clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>toast.classList.remove("show"), 4500);
 }
 function allKeysForDay(week,day,plan){
   const keys=[];
@@ -965,6 +977,13 @@ function renderProgress(plan){
   progressTotal.textContent=total;
   paceBadge.textContent = pct===100 ? "Pace: Complete" : pct>=70 ? "Pace: Strong" : pct>=35 ? "Pace: On Track" : "Pace: Starting";
   panelSub.textContent = pct===100 ? `Plan: ${plan.title}. Completed — great work.` : `Plan: ${plan.title}. Tap sets to check them off.`;
+  if(pct>lastPct){
+    barFill.classList.remove("shine"); void barFill.offsetWidth; barFill.classList.add("shine");
+  }
+  const isMilestone = [25,50,75,100].includes(pct);
+  progressWrap.classList.toggle("milestone", isMilestone);
+  paceBadge.classList.toggle("pulse", isMilestone);
+  lastPct=pct;
 }
 
 function renderPlan(){
