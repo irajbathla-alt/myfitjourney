@@ -20,9 +20,9 @@ header.compact .brand .sub{opacity:.55}
 .brand .sub{margin:0;font-size:12px;color:var(--muted);text-align:center;}
 .pill{display:inline-flex;align-items:center;gap:10px;padding:10px 12px;border-radius:999px;border:1px solid rgba(255,255,255,.12);background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));color:var(--text);font-weight:950;font-size:12px;letter-spacing:.2px;user-select:none;white-space:nowrap;box-shadow:inset 0 1px 0 rgba(255,255,255,.08);} 
 .pill .dot{width:10px;height:10px;border-radius:999px;background:rgba(255,255,255,.20);border:1px solid rgba(255,255,255,.25);}
-.topRow{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin-top:6px;}
-.meta{display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:center;width:100%;}
-.actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;width:100%;margin-top:10px}
+.topRow{display:flex;gap:8px;align-items:center;justify-content:center;flex-wrap:wrap;margin-top:2px;}
+.meta{display:none}
+.actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;width:100%;margin-top:6px}
 .btn{appearance:none;border:1px solid rgba(255,255,255,.14);background:linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.05));color:var(--text);padding:10px 12px;border-radius:14px;font-weight:950;font-size:12px;cursor:pointer;white-space:nowrap;transition:transform var(--dur-fast) var(--ease-standard), background var(--dur-fast) var(--ease-standard), border-color var(--dur-fast) var(--ease-standard), box-shadow var(--dur-fast) var(--ease-standard);} 
 .btn:hover{border-color:rgba(255,255,255,.30);box-shadow:var(--glow)}
 .btn:active{transform:scale(.98)}
@@ -97,14 +97,6 @@ header.compact .brand .sub{opacity:.55}
     <h1>My Fit Journey</h1>
     <p class="sub">Strength Builder • 8 Weeks • Progress Saved ✓</p>
   </div>
-  <div class="topRow">
-    <div class="meta">
-      <div class="pill" id="metaWeek"><span class="dot"></span><span>Week 1</span></div>
-      <div class="pill" id="metaDay"><span class="dot" style="background:var(--warn)"></span><span>Day 1</span></div>
-      <div class="pill" id="metaTitle"><span class="dot"></span><span>—</span></div>
-    </div>
-  </div>
-
   <div class="actions">
     <label class="pill" style="cursor:default">
       <span class="dot"></span><span>Week</span>
@@ -908,9 +900,6 @@ async function initCloudState() {
 }
 
 const content=document.getElementById("content");
-const metaWeek=document.getElementById("metaWeek");
-const metaDay=document.getElementById("metaDay");
-const metaTitle=document.getElementById("metaTitle");
 const panelTitle=document.getElementById("panelTitle");
 const panelSub=document.getElementById("panelSub");
 const barFill=document.getElementById("barFill");
@@ -990,9 +979,6 @@ function renderPlan(){
   const week=String(state.week), day=String(state.day);
   const plan = (SPLIT[week]||{})[day];
   if(!plan){
-    metaWeek.querySelector("span:last-child").textContent=`Week ${state.week}`;
-    metaDay.querySelector("span:last-child").textContent=`Day ${state.day}`;
-    metaTitle.querySelector("span:last-child").textContent="—";
     panelTitle.textContent=`Week ${state.week} • Day ${state.day}`;
     panelSub.textContent="This day is missing workout data.";
     nowBadge.textContent="Now: Rest";
@@ -1001,9 +987,6 @@ function renderPlan(){
     barFill.style.width="0%"; progressPct.textContent="0%"; progressDone.textContent="0"; progressTotal.textContent="0";
     return;
   }
-  metaWeek.querySelector("span:last-child").textContent=`Week ${state.week}`;
-  metaDay.querySelector("span:last-child").textContent=`Day ${state.day}`;
-  metaTitle.querySelector("span:last-child").textContent=plan.title;
   panelTitle.textContent=`Week ${state.week} • Day ${state.day}`;
 
   const morning=plan.morning||[];
