@@ -6,23 +6,29 @@
 <title>Jalandhar Fitness Club — Strength Builder</title>
 <meta name="theme-color" content="#0b0b0c"/>
 <style>
-:root{--bg:#0b0b0c;--panel:rgba(255,255,255,.04);--panel2:rgba(255,255,255,.02);--text:#f6f6f8;--muted:#a7a7ad;--shadow:0 12px 34px rgba(0,0,0,.55);--r1:18px;--r2:26px;--good:#7CFC9A;--warn:#FFD27A;}
+:root{--bg:#0b0b0c;--panel:rgba(255,255,255,.04);--panel2:rgba(255,255,255,.02);--text:#f6f6f8;--muted:#a7a7ad;--shadow:0 12px 34px rgba(0,0,0,.55);--r1:18px;--r2:26px;--good:#7CFC9A;--warn:#FFD27A;--accent:#c7d2ff;--glow:0 0 0 1px rgba(199,210,255,.15),0 12px 30px rgba(109,132,255,.15);--glow-soft:0 8px 20px rgba(0,0,0,.26);--dur-fast:.18s;--dur-med:.32s;--dur-slow:.55s;--ease-standard:cubic-bezier(.2,.65,.2,1);} 
 *{box-sizing:border-box} html,body{height:100%}
 body{margin:0;font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;background:radial-gradient(1200px 800px at 50% -20%, rgba(255,255,255,.08), transparent 60%),radial-gradient(900px 600px at 10% 10%, rgba(255,255,255,.05), transparent 55%),var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;text-rendering:geometricPrecision;letter-spacing:.2px;overflow-x:hidden;}
-.app{max-width:620px;margin:0 auto;min-height:100%;padding:calc(env(safe-area-inset-top) + 14px) 14px calc(env(safe-area-inset-bottom) + 24px);}
-header{position:sticky;top:0;z-index:50;margin:-14px -14px 12px;padding:12px 14px 12px;backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);background:linear-gradient(to bottom, rgba(11,11,12,.92), rgba(11,11,12,.55), rgba(11,11,12,0));border-bottom:1px solid rgba(255,255,255,.06);}
+.app{max-width:620px;margin:0 auto;min-height:100%;padding:calc(env(safe-area-inset-top) + 14px) 14px calc(env(safe-area-inset-bottom) + 24px);animation:fadeIn .45s ease;}
+@keyframes fadeIn{from{opacity:.7;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+header{position:sticky;top:0;z-index:50;margin:-14px -14px 12px;padding:12px 14px 12px;backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);background:linear-gradient(to bottom, rgba(11,11,12,.94), rgba(11,11,12,.62), rgba(11,11,12,.06));border-bottom:1px solid rgba(255,255,255,.08);transition:padding var(--dur-med) var(--ease-standard),background var(--dur-med) var(--ease-standard);}
+header.compact{padding:8px 14px 8px;background:linear-gradient(to bottom, rgba(11,11,12,.98), rgba(11,11,12,.78));}
+header.compact .brand h1{font-size:25px;transform:translateY(-1px)}
+header.compact .brand .sub{opacity:.55}
 .brand{display:flex;flex-direction:column;align-items:center;gap:6px;padding:6px 0 10px;}
-.brand h1{margin:0;font-size:28px;line-height:1.05;letter-spacing:.7px;font-weight:950;text-transform:uppercase;text-align:center;}
+.brand h1{margin:0;font-size:30px;line-height:1.05;letter-spacing:.3px;font-weight:700;font-family:"Brush Script MT","Segoe Script","Lucida Handwriting","Apple Chancery",cursive;text-transform:none;text-align:center;text-shadow:0 6px 22px rgba(255,255,255,.10);} 
 .brand .sub{margin:0;font-size:12px;color:var(--muted);text-align:center;}
-.pill{display:inline-flex;align-items:center;gap:10px;padding:10px 12px;border-radius:999px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.05);color:var(--text);font-weight:950;font-size:12px;letter-spacing:.2px;user-select:none;white-space:nowrap;}
+.pill{display:inline-flex;align-items:center;gap:10px;padding:10px 12px;border-radius:999px;border:1px solid rgba(255,255,255,.12);background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));color:var(--text);font-weight:950;font-size:12px;letter-spacing:.2px;user-select:none;white-space:nowrap;box-shadow:inset 0 1px 0 rgba(255,255,255,.08);} 
 .pill .dot{width:10px;height:10px;border-radius:999px;background:rgba(255,255,255,.20);border:1px solid rgba(255,255,255,.25);}
-.topRow{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin-top:6px;}
-.meta{display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:center;width:100%;}
-.actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;width:100%;margin-top:10px}
-.btn{appearance:none;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.06);color:var(--text);padding:10px 12px;border-radius:14px;font-weight:950;font-size:12px;cursor:pointer;white-space:nowrap;transition:transform .18s ease, background .18s ease, border-color .18s ease;}
+.topRow{display:flex;gap:8px;align-items:center;justify-content:center;flex-wrap:wrap;margin-top:2px;}
+.meta{display:none}
+.actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;width:100%;margin-top:6px}
+.btn{appearance:none;border:1px solid rgba(255,255,255,.14);background:linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.05));color:var(--text);padding:10px 12px;border-radius:14px;font-weight:950;font-size:12px;cursor:pointer;white-space:nowrap;transition:transform var(--dur-fast) var(--ease-standard), background var(--dur-fast) var(--ease-standard), border-color var(--dur-fast) var(--ease-standard), box-shadow var(--dur-fast) var(--ease-standard);} 
+.btn:hover{border-color:rgba(255,255,255,.30);box-shadow:var(--glow)}
 .btn:active{transform:scale(.98)}
 .btn.primary{background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.24);}
 .btn.ghost{background:transparent;border-color:rgba(255,255,255,.10);color:var(--muted);}
+.btn:focus-visible,.chip:focus-visible,.selectWrap select:focus-visible{outline:none;box-shadow:0 0 0 3px rgba(199,210,255,.2),var(--glow-soft);border-color:rgba(199,210,255,.55);}
 
 .selectWrap{position:relative;display:inline-flex;align-items:center;margin-left:8px}
 .selectWrap::after{content:"▾";position:absolute;right:10px;pointer-events:none;font-size:14px;color:rgba(255,255,255,.90);}
@@ -30,13 +36,21 @@ header{position:sticky;top:0;z-index:50;margin:-14px -14px 12px;padding:12px 14p
 .selectWrap select:focus{border-color: rgba(255,255,255,.40);box-shadow: 0 0 0 3px rgba(255,255,255,.08);}
 .selectWrap select option{background:#0b0b0c;color:var(--text);}
 
-.panel{background:linear-gradient(180deg,var(--panel),var(--panel2));border:1px solid rgba(255,255,255,.08);border-radius:var(--r2);box-shadow:var(--shadow);overflow:hidden;}
-.panelHead{padding:14px 14px 12px;border-bottom:1px solid rgba(255,255,255,.06);display:flex;align-items:flex-start;justify-content:space-between;gap:12px;}
+.panel{background:linear-gradient(180deg,var(--panel),var(--panel2));border:1px solid rgba(255,255,255,.10);border-radius:var(--r2);box-shadow:var(--shadow);overflow:hidden;position:relative;}
+.panel::before{content:"";position:absolute;inset:0 0 auto 0;height:1px;background:linear-gradient(90deg, transparent, rgba(199,210,255,.55), transparent);} 
+.panelHead{padding:14px 14px 12px;border-bottom:1px solid rgba(255,255,255,.06);display:flex;align-items:flex-start;justify-content:space-between;gap:12px;background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,0));}
 .panelHead h2{margin:0;font-size:16px;font-weight:950;letter-spacing:.2px;text-transform:uppercase;}
 .panelHead p{margin:6px 0 0;color:var(--muted);font-size:12px;line-height:1.25;}
+.statusPill{font-size:11px;font-weight:900;letter-spacing:.25px;text-transform:uppercase;padding:6px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.15);background:linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.04));}
+.statusPill.sync{border-color:rgba(124,252,154,.35)}
+.statusPill.sync.offline{border-color:rgba(255,210,122,.35)}
 .content{padding:14px;display:flex;flex-direction:column;gap:12px;}
 .sectionTitle{font-size:12px;color:var(--muted);letter-spacing:.35px;text-transform:uppercase;margin:8px 2px -2px;display:flex;justify-content:space-between;gap:10px;}
-.card{background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));border:1px solid rgba(255,255,255,.08);border-radius:var(--r1);overflow:hidden;}
+.card{background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));border:1px solid rgba(255,255,255,.08);border-radius:var(--r1);overflow:hidden;box-shadow:var(--glow-soft);animation:cardIn .45s ease both;}
+.card.active{border-color:rgba(199,210,255,.55);box-shadow:0 0 0 1px rgba(199,210,255,.25),0 14px 32px rgba(104,130,255,.20)}
+.card.done{opacity:.68;filter:saturate(.8)}
+.card.next{border-color:rgba(255,255,255,.18)}
+.content .card:nth-child(2){animation-delay:.04s}.content .card:nth-child(3){animation-delay:.08s}.content .card:nth-child(4){animation-delay:.12s}.content .card:nth-child(5){animation-delay:.16s}.content .card:nth-child(6){animation-delay:.20s}.content .card:nth-child(7){animation-delay:.24s}
 .cardInner{display:flex;gap:12px;padding:12px;align-items:center;}
 .thumb{width:78px;height:78px;border-radius:18px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.10);overflow:hidden;flex:0 0 auto;position:relative;display:flex;align-items:center;justify-content:center;}
 .thumb svg{width:100%;height:100%}
@@ -46,35 +60,41 @@ header{position:sticky;top:0;z-index:50;margin:-14px -14px 12px;padding:12px 14p
 .name{margin:0 0 6px;font-weight:950;letter-spacing:.2px;font-size:15px;line-height:1.2;text-transform:uppercase;}
 .detail{margin:0;color:var(--muted);font-size:12px;line-height:1.35;}
 .sets{margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;}
-.chip{display:inline-flex;align-items:center;gap:8px;padding:8px 10px;border-radius:999px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.10);font-size:12px;color:var(--text);cursor:pointer;user-select:none;white-space:nowrap;transition:transform .18s ease, background .18s ease, border-color .18s ease;}
+.chip{display:inline-flex;align-items:center;gap:8px;padding:8px 10px;border-radius:999px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.10);font-size:12px;color:var(--text);cursor:pointer;user-select:none;white-space:nowrap;transition:transform .18s ease, background .18s ease, border-color .18s ease, box-shadow .18s ease;}
+.chip:hover{border-color:rgba(255,255,255,.24);box-shadow:0 8px 18px rgba(0,0,0,.25);} 
 .chip:active{transform:scale(.98)}
+.chip.checked{animation:pop .24s ease;}
 .chip .dot{width:10px;height:10px;border-radius:999px;border:1px solid rgba(255,255,255,.35);background:transparent;box-shadow:inset 0 0 0 1px rgba(0,0,0,.35);}
 .chip.checked{background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.24);}
 .chip.checked .dot{background:var(--good);border-color:rgba(255,255,255,.55);box-shadow:0 0 0 3px rgba(124,252,154,.14);}
-.progressWrap{padding:12px 14px 14px;border-top:1px solid rgba(255,255,255,.06);background:rgba(0,0,0,.18);}
+.progressWrap{padding:12px 14px 14px;border-top:1px solid rgba(255,255,255,.06);background:linear-gradient(180deg, rgba(0,0,0,.12), rgba(0,0,0,.24));position:sticky;bottom:0;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);}
 .bar{width:100%;height:10px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.10);border-radius:999px;overflow:hidden;}
-.bar>div{height:100%;width:0%;background:linear-gradient(90deg, rgba(255,255,255,.55), rgba(255,255,255,.95));border-radius:999px;transition:width .25s ease;}
+.bar>div{height:100%;width:0%;background:linear-gradient(90deg, rgba(255,255,255,.48), rgba(255,255,255,.95), rgba(255,255,255,.6));background-size:180% 100%;border-radius:999px;transition:width .25s ease;animation:none;}
+.bar>div.shine{animation:progressShine 1.2s linear 1;}
+.progressWrap.milestone{box-shadow:0 -1px 0 rgba(255,255,255,.22),0 -8px 24px rgba(199,210,255,.18)}
 .progressMeta{display:flex;justify-content:space-between;align-items:center;margin-top:8px;font-size:12px;color:var(--muted);gap:10px;flex-wrap:wrap;}
 .progressMeta b{color:var(--text)}
 .empty{padding:14px;border:1px dashed rgba(255,255,255,.14);border-radius:var(--r1);background:rgba(255,255,255,.03);color:var(--muted);font-size:13px;line-height:1.4;}
-@media (max-width:380px){.thumb{width:72px;height:72px}.brand h1{font-size:26px}}
+.toast{position:fixed;left:50%;transform:translateX(-50%) translateY(10px);bottom:22px;z-index:80;background:rgba(10,10,12,.95);border:1px solid rgba(255,255,255,.2);padding:10px 12px;border-radius:12px;font-size:12px;display:flex;gap:10px;align-items:center;opacity:0;pointer-events:none;transition:opacity var(--dur-med) var(--ease-standard),transform var(--dur-med) var(--ease-standard)}
+.toast::before{content:"";position:absolute;left:0;bottom:0;height:2px;width:100%;background:var(--accent);transform-origin:left center;transform:scaleX(0)}
+.toast.show{opacity:1;pointer-events:auto;transform:translateX(-50%) translateY(0)}
+.toast.show::before{animation:toastTimer 4.5s linear 1}
+.toast button{all:unset;cursor:pointer;color:var(--accent);font-weight:900}
+@keyframes cardIn{from{opacity:0;transform:translateY(8px) scale(.985)}to{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes pop{0%{transform:scale(.96)}70%{transform:scale(1.04)}100%{transform:scale(1)}}
+@keyframes progressShine{0%{background-position:0% 0}100%{background-position:180% 0}}
+@keyframes toastTimer{from{transform:scaleX(1)}to{transform:scaleX(0)}}
+@media (max-width:380px){.thumb{width:72px;height:72px}.brand h1{font-size:26px}.actions{gap:6px}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
 <body>
 <div class="app">
 <header>
   <div class="brand">
-    <h1>Jalandhar Fitness Club</h1>
-    <p class="sub">Strength Builder • 8 Weeks • Progress Saved</p>
+    <h1>My Fit Journey</h1>
+    <p class="sub">Strength Builder • 8 Weeks • Progress Saved ✓</p>
   </div>
-  <div class="topRow">
-    <div class="meta">
-      <div class="pill" id="metaWeek"><span class="dot"></span><span>Week 1</span></div>
-      <div class="pill" id="metaDay"><span class="dot" style="background:var(--warn)"></span><span>Day 1</span></div>
-      <div class="pill" id="metaTitle"><span class="dot"></span><span>—</span></div>
-    </div>
-  </div>
-
   <div class="actions">
     <label class="pill" style="cursor:default">
       <span class="dot"></span><span>Week</span>
@@ -113,7 +133,6 @@ header{position:sticky;top:0;z-index:50;margin:-14px -14px 12px;padding:12px 14p
         <option value="5">5</option><option value="6">6</option><option value="7">7</option>
       </select></div>
     </label>
-
     <button class="btn ghost" id="resetBtn">Reset Day</button>
     <button class="btn primary" id="markAllBtn">Mark All</button>
   </div>
@@ -136,6 +155,7 @@ header{position:sticky;top:0;z-index:50;margin:-14px -14px 12px;padding:12px 14p
   </div>
 </section>
 </div>
+<div class="toast" id="toast"><span id="toastText">Updated</span><button id="undoBtn">Undo</button></div>
 
 <script src="shared-config.js"></script>
 <script src="shared-api.js"></script>
@@ -875,17 +895,21 @@ async function initCloudState() {
 }
 
 const content=document.getElementById("content");
-const metaWeek=document.getElementById("metaWeek");
-const metaDay=document.getElementById("metaDay");
-const metaTitle=document.getElementById("metaTitle");
 const panelTitle=document.getElementById("panelTitle");
 const panelSub=document.getElementById("panelSub");
 const barFill=document.getElementById("barFill");
 const progressPct=document.getElementById("progressPct");
 const progressDone=document.getElementById("progressDone");
 const progressTotal=document.getElementById("progressTotal");
+const toast=document.getElementById("toast");
+const toastText=document.getElementById("toastText");
+const undoBtn=document.getElementById("undoBtn");
+const progressWrap=document.querySelector(".progressWrap");
 const weekSelect=document.getElementById("weekSelect");
 const daySelect=document.getElementById("daySelect");
+let undoSnapshot=null;
+let toastTimer=null;
+let lastPct=0;
 
 function keyFor(week,day,name,idx){return `w${week}|d${day}|${name}|${idx}`;}
 
@@ -894,12 +918,29 @@ function chipHTML(week,day,name,i,label){
   const checked=!!state.checks[k];
   return `<div class="chip ${checked?"checked":""}" data-key="${k}"><span class="dot"></span><span>${safe(label)}</span></div>`;
 }
-function card(week,day,item){
+function card(week,day,item,stateClass){
   const chips=(item.sets||[]).map((s,i)=>chipHTML(week,day,item.name,i,`Set ${i+1}: ${s}`)).join("");
-  return `<div class="card"><div class="cardInner"><div class="thumb">${svgIcon(item.name)}<div class="shine"></div></div><div class="info"><p class="name">${safe(item.name)}</p><p class="detail">${safe((item.sets||[]).join(" • "))}</p><div class="sets">${chips}</div></div></div></div>`;
+  return `<div class="card ${stateClass||""}"><div class="cardInner"><div class="thumb">${svgIcon(item.name)}<div class="shine"></div></div><div class="info"><p class="name">${safe(item.name)}</p><p class="detail">${safe((item.sets||[]).join(" • "))}</p><div class="sets">${chips}</div></div></div></div>`;
 }
-function section(week,day,title,items,hint){
-  return `<div class="sectionTitle"><span>${title}</span><small>${hint||""}</small></div>` + items.map(it=>card(week,day,it)).join("");
+function section(week,day,title,items,hint,activeName,nextName){
+  return `<div class="sectionTitle"><span>${title}</span><small>${hint||""}</small></div>` + items.map(it=>{
+    const cls = it.name===activeName ? "active" : it.name===nextName ? "next" : ((it.sets||[]).every((_,i)=>!!state.checks[keyFor(week,day,it.name,i)]) ? "done" : "");
+    return card(week,day,it,cls);
+  }).join("");
+}
+function updateTrustStatus(mode="synced"){
+  const syncPill=document.getElementById("syncPill");
+  const stampPill=document.getElementById("stampPill");
+  if(!syncPill || !stampPill) return;
+  const t=new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+  stampPill.textContent=`Updated ${t}`;
+  syncPill.textContent = mode==="offline" ? "Offline — local only" : "Synced just now";
+  syncPill.classList.toggle("offline", mode==="offline");
+}
+function showToast(msg, onUndo){
+  toastText.textContent=msg; toast.classList.add("show"); undoSnapshot=onUndo;
+  if(toastTimer) clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>toast.classList.remove("show"), 4500);
 }
 function allKeysForDay(week,day,plan){
   const keys=[];
@@ -915,35 +956,37 @@ function renderProgress(plan){
   progressPct.textContent=pct+"%";
   progressDone.textContent=done;
   progressTotal.textContent=total;
+  panelSub.textContent = pct===100 ? `Plan: ${plan.title}. Completed — great work.` : `Plan: ${plan.title}. Tap sets to check them off.`;
+  if(pct>lastPct){
+    barFill.classList.remove("shine"); void barFill.offsetWidth; barFill.classList.add("shine");
+  }
+  const isMilestone = [25,50,75,100].includes(pct);
+  progressWrap.classList.toggle("milestone", isMilestone);
+  lastPct=pct;
 }
 
 function renderPlan(){
   const week=String(state.week), day=String(state.day);
   const plan = (SPLIT[week]||{})[day];
   if(!plan){
-    metaWeek.querySelector("span:last-child").textContent=`Week ${state.week}`;
-    metaDay.querySelector("span:last-child").textContent=`Day ${state.day}`;
-    metaTitle.querySelector("span:last-child").textContent="—";
     panelTitle.textContent=`Week ${state.week} • Day ${state.day}`;
     panelSub.textContent="This day is missing workout data.";
     content.innerHTML = `<div class="empty">No workout data found for Week ${state.week} Day ${state.day}.</div>`;
     barFill.style.width="0%"; progressPct.textContent="0%"; progressDone.textContent="0"; progressTotal.textContent="0";
     return;
   }
-  metaWeek.querySelector("span:last-child").textContent=`Week ${state.week}`;
-  metaDay.querySelector("span:last-child").textContent=`Day ${state.day}`;
-  metaTitle.querySelector("span:last-child").textContent=plan.title;
   panelTitle.textContent=`Week ${state.week} • Day ${state.day}`;
-  panelSub.textContent=`Plan: ${plan.title}. Tap sets to check them off.`;
 
   const morning=plan.morning||[];
   const workout=plan.workout||[];
   const finish=plan.finish||[];
+  const activeItem = workout.find(item => (item.sets||[]).some((_,i)=>!state.checks[keyFor(state.week,state.day,item.name,i)])) || workout[0] || morning[0] || finish[0];
+  const nextItem = workout.find(item => item!==activeItem && (item.sets||[]).some((_,i)=>!state.checks[keyFor(state.week,state.day,item.name,i)]));
 
   let out="";
-  if(morning.length) out += section(state.week,state.day,"Morning",morning,"start smooth");
-  out += workout.length ? section(state.week,state.day,"Workout",workout,"push hard") : (`<div class="sectionTitle"><span>Workout</span><small>rest</small></div><div class="empty">No weights today — active rest.</div>`);
-  if(finish.length) out += section(state.week,state.day,"Finish",finish,"clean close");
+  if(morning.length) out += section(state.week,state.day,"Morning",morning,"start smooth", activeItem && activeItem.name, nextItem && nextItem.name);
+  out += workout.length ? section(state.week,state.day,"Workout",workout,"push hard", activeItem && activeItem.name, nextItem && nextItem.name) : (`<div class="sectionTitle"><span>Workout</span><small>rest</small></div><div class="empty">No weights today — active rest.</div>`);
+  if(finish.length) out += section(state.week,state.day,"Finish",finish,"clean close", activeItem && activeItem.name, nextItem && nextItem.name);
   content.innerHTML=out;
 
   content.onclick=(e)=>{
@@ -952,6 +995,7 @@ function renderPlan(){
     state.checks[k]=!state.checks[k];
     chip.classList.toggle("checked", !!state.checks[k]);
     saveState();
+    updateTrustStatus(typeof navigator!=="undefined" && navigator.onLine ? "synced" : "offline");
     renderProgress(plan);
   };
   renderProgress(plan);
@@ -968,19 +1012,27 @@ daySelect.addEventListener("change", ()=>{ state.day = Number(daySelect.value); 
 document.getElementById("resetBtn").addEventListener("click",()=>{
   const plan = (SPLIT[String(state.week)]||{})[String(state.day)];
   if(!plan) return;
+  const prev = JSON.stringify(state.checks);
   allKeysForDay(state.week,state.day,plan).forEach(k=>delete state.checks[k]);
   saveState();
+  updateTrustStatus(typeof navigator!=="undefined" && navigator.onLine ? "synced" : "offline");
   document.querySelectorAll(".chip.checked").forEach(el=>el.classList.remove("checked"));
   renderProgress(plan);
+  showToast("Day reset", ()=>{ state.checks=JSON.parse(prev); saveState(); renderPlan(); });
 });
 document.getElementById("markAllBtn").addEventListener("click",()=>{
   const plan = (SPLIT[String(state.week)]||{})[String(state.day)];
   if(!plan) return;
+  const prev = JSON.stringify(state.checks);
   allKeysForDay(state.week,state.day,plan).forEach(k=>state.checks[k]=true);
   saveState();
+  updateTrustStatus(typeof navigator!=="undefined" && navigator.onLine ? "synced" : "offline");
   document.querySelectorAll(".chip").forEach(el=>el.classList.add("checked"));
   renderProgress(plan);
+  showToast("All sets marked", ()=>{ state.checks=JSON.parse(prev); saveState(); renderPlan(); });
 });
+undoBtn.addEventListener("click", ()=>{ if(undoSnapshot){ undoSnapshot(); toast.classList.remove("show"); undoSnapshot=null; } });
+window.addEventListener("scroll", ()=>document.querySelector("header").classList.toggle("compact", window.scrollY>24));
 
 
 // Proper initialization from saved state
