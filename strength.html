@@ -41,7 +41,6 @@ header.compact .brand .sub{opacity:.55}
 .panelHead{padding:14px 14px 12px;border-bottom:1px solid rgba(255,255,255,.06);display:flex;align-items:flex-start;justify-content:space-between;gap:12px;background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,0));}
 .panelHead h2{margin:0;font-size:16px;font-weight:950;letter-spacing:.2px;text-transform:uppercase;}
 .panelHead p{margin:6px 0 0;color:var(--muted);font-size:12px;line-height:1.25;}
-.statusRow{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
 .statusPill{font-size:11px;font-weight:900;letter-spacing:.25px;text-transform:uppercase;padding:6px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.15);background:linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.04));}
 .statusPill.sync{border-color:rgba(124,252,154,.35)}
 .statusPill.sync.offline{border-color:rgba(255,210,122,.35)}
@@ -73,7 +72,6 @@ header.compact .brand .sub{opacity:.55}
 .bar>div{height:100%;width:0%;background:linear-gradient(90deg, rgba(255,255,255,.48), rgba(255,255,255,.95), rgba(255,255,255,.6));background-size:180% 100%;border-radius:999px;transition:width .25s ease;animation:none;}
 .bar>div.shine{animation:progressShine 1.2s linear 1;}
 .progressWrap.milestone{box-shadow:0 -1px 0 rgba(255,255,255,.22),0 -8px 24px rgba(199,210,255,.18)}
-.statusPill.pulse{animation:pop .28s ease}
 .progressMeta{display:flex;justify-content:space-between;align-items:center;margin-top:8px;font-size:12px;color:var(--muted);gap:10px;flex-wrap:wrap;}
 .progressMeta b{color:var(--text)}
 .empty{padding:14px;border:1px dashed rgba(255,255,255,.14);border-radius:var(--r1);background:rgba(255,255,255,.03);color:var(--muted);font-size:13px;line-height:1.4;}
@@ -906,8 +904,6 @@ const barFill=document.getElementById("barFill");
 const progressPct=document.getElementById("progressPct");
 const progressDone=document.getElementById("progressDone");
 const progressTotal=document.getElementById("progressTotal");
-const nowBadge=document.getElementById("nowBadge");
-const paceBadge=document.getElementById("paceBadge");
 const themeSelect=document.getElementById("themeSelect");
 const toast=document.getElementById("toast");
 const toastText=document.getElementById("toastText");
@@ -964,14 +960,12 @@ function renderProgress(plan){
   progressPct.textContent=pct+"%";
   progressDone.textContent=done;
   progressTotal.textContent=total;
-  paceBadge.textContent = pct===100 ? "Pace: Complete" : pct>=70 ? "Pace: Strong" : pct>=35 ? "Pace: On Track" : "Pace: Starting";
   panelSub.textContent = pct===100 ? `Plan: ${plan.title}. Completed — great work.` : `Plan: ${plan.title}. Tap sets to check them off.`;
   if(pct>lastPct){
     barFill.classList.remove("shine"); void barFill.offsetWidth; barFill.classList.add("shine");
   }
   const isMilestone = [25,50,75,100].includes(pct);
   progressWrap.classList.toggle("milestone", isMilestone);
-  paceBadge.classList.toggle("pulse", isMilestone);
   lastPct=pct;
 }
 
@@ -994,7 +988,6 @@ function renderPlan(){
   const finish=plan.finish||[];
   const activeItem = workout.find(item => (item.sets||[]).some((_,i)=>!state.checks[keyFor(state.week,state.day,item.name,i)])) || workout[0] || morning[0] || finish[0];
   const nextItem = workout.find(item => item!==activeItem && (item.sets||[]).some((_,i)=>!state.checks[keyFor(state.week,state.day,item.name,i)]));
-  nowBadge.textContent = `Now: ${activeItem ? activeItem.name : "Recovery"}`;
 
   let out="";
   if(morning.length) out += section(state.week,state.day,"Morning",morning,"start smooth", activeItem && activeItem.name, nextItem && nextItem.name);
