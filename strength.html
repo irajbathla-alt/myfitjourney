@@ -133,8 +133,6 @@ header.compact .brand .sub{opacity:.55}
         <option value="5">5</option><option value="6">6</option><option value="7">7</option>
       </select></div>
     </label>
-    <label class="pill" style="cursor:default"><span class="dot"></span><span>Theme</span><div class="selectWrap"><select id="themeSelect" aria-label="Theme"><option>Midnight</option><option>Graphite</option><option>Carbon</option><option>Aurora</option></select></div></label>
-
     <button class="btn ghost" id="resetBtn">Reset Day</button>
     <button class="btn primary" id="markAllBtn">Mark All</button>
   </div>
@@ -904,7 +902,6 @@ const barFill=document.getElementById("barFill");
 const progressPct=document.getElementById("progressPct");
 const progressDone=document.getElementById("progressDone");
 const progressTotal=document.getElementById("progressTotal");
-const themeSelect=document.getElementById("themeSelect");
 const toast=document.getElementById("toast");
 const toastText=document.getElementById("toastText");
 const undoBtn=document.getElementById("undoBtn");
@@ -1039,12 +1036,6 @@ document.getElementById("markAllBtn").addEventListener("click",()=>{
 });
 undoBtn.addEventListener("click", ()=>{ if(undoSnapshot){ undoSnapshot(); toast.classList.remove("show"); undoSnapshot=null; } });
 window.addEventListener("scroll", ()=>document.querySelector("header").classList.toggle("compact", window.scrollY>24));
-themeSelect.addEventListener("change", ()=>{
-  const t=themeSelect.value;
-  const map={Midnight:"#c7d2ff",Graphite:"#e6e6e6",Carbon:"#9fc5ff",Aurora:"#8cffd6"};
-  document.documentElement.style.setProperty("--accent", map[t]||"#c7d2ff");
-  updateTrustStatus("synced");
-});
 
 
 // Proper initialization from saved state
