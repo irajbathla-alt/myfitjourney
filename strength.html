@@ -38,9 +38,12 @@ header{position:sticky;top:0;z-index:50;margin:-14px -14px 12px;padding:12px 14p
 .panelHead{padding:14px 14px 12px;border-bottom:1px solid rgba(255,255,255,.06);display:flex;align-items:flex-start;justify-content:space-between;gap:12px;background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,0));}
 .panelHead h2{margin:0;font-size:16px;font-weight:950;letter-spacing:.2px;text-transform:uppercase;}
 .panelHead p{margin:6px 0 0;color:var(--muted);font-size:12px;line-height:1.25;}
+.statusRow{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.statusPill{font-size:11px;font-weight:900;letter-spacing:.25px;text-transform:uppercase;padding:6px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.15);background:linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.04));}
 .content{padding:14px;display:flex;flex-direction:column;gap:12px;}
 .sectionTitle{font-size:12px;color:var(--muted);letter-spacing:.35px;text-transform:uppercase;margin:8px 2px -2px;display:flex;justify-content:space-between;gap:10px;}
 .card{background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));border:1px solid rgba(255,255,255,.08);border-radius:var(--r1);overflow:hidden;box-shadow:var(--glow-soft);animation:cardIn .45s ease both;}
+.card.active{border-color:rgba(199,210,255,.55);box-shadow:0 0 0 1px rgba(199,210,255,.25),0 14px 32px rgba(104,130,255,.20)}
 .content .card:nth-child(2){animation-delay:.04s}.content .card:nth-child(3){animation-delay:.08s}.content .card:nth-child(4){animation-delay:.12s}.content .card:nth-child(5){animation-delay:.16s}.content .card:nth-child(6){animation-delay:.20s}.content .card:nth-child(7){animation-delay:.24s}
 .cardInner{display:flex;gap:12px;padding:12px;align-items:center;}
 .thumb{width:78px;height:78px;border-radius:18px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.10);overflow:hidden;flex:0 0 auto;position:relative;display:flex;align-items:center;justify-content:center;}
@@ -75,7 +78,7 @@ header{position:sticky;top:0;z-index:50;margin:-14px -14px 12px;padding:12px 14p
 <div class="app">
 <header>
   <div class="brand">
-    <h1>Jalandhar Fitness Club</h1>
+    <h1>My Fit Journey</h1>
     <p class="sub">Strength Builder • 8 Weeks • Progress Saved ✓</p>
   </div>
   <div class="topRow">
@@ -135,6 +138,7 @@ header{position:sticky;top:0;z-index:50;margin:-14px -14px 12px;padding:12px 14p
     <div>
       <h2 id="panelTitle">Week 1 • Day 1</h2>
       <p id="panelSub">Tap sets to check them off. Progress saves automatically.</p>
+      <div class="statusRow"><span class="statusPill" id="nowBadge">Now: Warm-up</span><span class="statusPill" id="paceBadge">Pace: Starting</span></div>
     </div>
   </div>
   <div class="content" id="content"></div>
@@ -895,6 +899,8 @@ const barFill=document.getElementById("barFill");
 const progressPct=document.getElementById("progressPct");
 const progressDone=document.getElementById("progressDone");
 const progressTotal=document.getElementById("progressTotal");
+const nowBadge=document.getElementById("nowBadge");
+const paceBadge=document.getElementById("paceBadge");
 const weekSelect=document.getElementById("weekSelect");
 const daySelect=document.getElementById("daySelect");
 
@@ -905,12 +911,12 @@ function chipHTML(week,day,name,i,label){
   const checked=!!state.checks[k];
   return `<div class="chip ${checked?"checked":""}" data-key="${k}"><span class="dot"></span><span>${safe(label)}</span></div>`;
 }
-function card(week,day,item){
+function card(week,day,item,isActive){
   const chips=(item.sets||[]).map((s,i)=>chipHTML(week,day,item.name,i,`Set ${i+1}: ${s}`)).join("");
-  return `<div class="card"><div class="cardInner"><div class="thumb">${svgIcon(item.name)}<div class="shine"></div></div><div class="info"><p class="name">${safe(item.name)}</p><p class="detail">${safe((item.sets||[]).join(" • "))}</p><div class="sets">${chips}</div></div></div></div>`;
+  return `<div class="card ${isActive?"active":""}"><div class="cardInner"><div class="thumb">${svgIcon(item.name)}<div class="shine"></div></div><div class="info"><p class="name">${safe(item.name)}</p><p class="detail">${safe((item.sets||[]).join(" • "))}</p><div class="sets">${chips}</div></div></div></div>`;
 }
-function section(week,day,title,items,hint){
-  return `<div class="sectionTitle"><span>${title}</span><small>${hint||""}</small></div>` + items.map(it=>card(week,day,it)).join("");
+function section(week,day,title,items,hint,activeName){
+  return `<div class="sectionTitle"><span>${title}</span><small>${hint||""}</small></div>` + items.map(it=>card(week,day,it,it.name===activeName)).join("");
 }
 function allKeysForDay(week,day,plan){
   const keys=[];
@@ -926,6 +932,7 @@ function renderProgress(plan){
   progressPct.textContent=pct+"%";
   progressDone.textContent=done;
   progressTotal.textContent=total;
+  paceBadge.textContent = pct===100 ? "Pace: Complete" : pct>=70 ? "Pace: Strong" : pct>=35 ? "Pace: On Track" : "Pace: Starting";
 }
 
 function renderPlan(){
@@ -937,6 +944,8 @@ function renderPlan(){
     metaTitle.querySelector("span:last-child").textContent="—";
     panelTitle.textContent=`Week ${state.week} • Day ${state.day}`;
     panelSub.textContent="This day is missing workout data.";
+    nowBadge.textContent="Now: Rest";
+    paceBadge.textContent="Pace: —";
     content.innerHTML = `<div class="empty">No workout data found for Week ${state.week} Day ${state.day}.</div>`;
     barFill.style.width="0%"; progressPct.textContent="0%"; progressDone.textContent="0"; progressTotal.textContent="0";
     return;
@@ -950,11 +959,13 @@ function renderPlan(){
   const morning=plan.morning||[];
   const workout=plan.workout||[];
   const finish=plan.finish||[];
+  const activeItem = workout.find(item => (item.sets||[]).some((_,i)=>!state.checks[keyFor(state.week,state.day,item.name,i)])) || workout[0] || morning[0] || finish[0];
+  nowBadge.textContent = `Now: ${activeItem ? activeItem.name : "Recovery"}`;
 
   let out="";
-  if(morning.length) out += section(state.week,state.day,"Morning",morning,"start smooth");
-  out += workout.length ? section(state.week,state.day,"Workout",workout,"push hard") : (`<div class="sectionTitle"><span>Workout</span><small>rest</small></div><div class="empty">No weights today — active rest.</div>`);
-  if(finish.length) out += section(state.week,state.day,"Finish",finish,"clean close");
+  if(morning.length) out += section(state.week,state.day,"Morning",morning,"start smooth", activeItem && activeItem.name);
+  out += workout.length ? section(state.week,state.day,"Workout",workout,"push hard", activeItem && activeItem.name) : (`<div class="sectionTitle"><span>Workout</span><small>rest</small></div><div class="empty">No weights today — active rest.</div>`);
+  if(finish.length) out += section(state.week,state.day,"Finish",finish,"clean close", activeItem && activeItem.name);
   content.innerHTML=out;
 
   content.onclick=(e)=>{
