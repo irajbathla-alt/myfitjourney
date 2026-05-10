@@ -935,6 +935,14 @@ function allKeysForDay(week,day,plan){
   [plan.morning,plan.workout,plan.finish].flat().forEach(item=> (item.sets||[]).forEach((_,i)=>keys.push(keyFor(week,day,item.uid,i)) ));
   return keys;
 }
+function withUids(plan){
+  return {
+    ...plan,
+    morning:(plan.morning||[]).map((item,idx)=>({...item,uid:`m-${idx}-${item.name}`})),
+    workout:(plan.workout||[]).map((item,idx)=>({...item,uid:`w-${idx}-${item.name}`})),
+    finish:(plan.finish||[]).map((item,idx)=>({...item,uid:`f-${idx}-${item.name}`}))
+  };
+}
 function renderProgress(plan){
   const keys=allKeysForDay(state.week,state.day,plan);
   const done=keys.filter(k=>!!state.checks[k]).length;
@@ -964,9 +972,10 @@ function renderPlan(){
   }
   panelTitle.textContent=`Week ${state.week} • Day ${state.day}`;
 
-  const morning=(plan.morning||[]).map((item,idx)=>({...item,uid:`m-${idx}-${item.name}`}));
-  const workout=(plan.workout||[]).map((item,idx)=>({...item,uid:`w-${idx}-${item.name}`}));
-  const finish=(plan.finish||[]).map((item,idx)=>({...item,uid:`f-${idx}-${item.name}`}));
+  const normalizedPlan = withUids(plan);
+  const morning=normalizedPlan.morning;
+  const workout=normalizedPlan.workout;
+  const finish=normalizedPlan.finish;
   const activeItem = workout.find(item => (item.sets||[]).some((_,i)=>!state.checks[keyFor(state.week,state.day,item.uid,i)])) || workout[0] || morning[0] || finish[0];
   const nextItem = workout.find(item => item!==activeItem && (item.sets||[]).some((_,i)=>!state.checks[keyFor(state.week,state.day,item.uid,i)]));
   exerciseDateTab.querySelector("span:last-child").textContent=`Exercise: ${activeItem ? activeItem.name : "Recovery"} (W${state.week} • D${state.day})`;
@@ -983,10 +992,9 @@ function renderPlan(){
     state.checks[k]=!state.checks[k];
     chip.classList.toggle("checked", !!state.checks[k]);
     saveState();
-    updateTrustStatus(typeof navigator!=="undefined" && navigator.onLine ? "synced" : "offline");
-    renderProgress(plan);
+    renderProgress(normalizedPlan);
   };
-  renderProgress(plan);
+  renderProgress(normalizedPlan);
 }
 
 
@@ -998,8 +1006,9 @@ weekSelect.addEventListener("change", ()=>{ state.week = Number(weekSelect.value
 daySelect.addEventListener("change", ()=>{ state.day = Number(daySelect.value); saveState(); renderPlan(); window.scrollTo({top:0,behavior:"smooth"}); });
 
 document.getElementById("resetBtn").addEventListener("click",()=>{
-  const plan = (SPLIT[String(state.week)]||{})[String(state.day)];
-  if(!plan) return;
+  const rawPlan = (SPLIT[String(state.week)]||{})[String(state.day)];
+  if(!rawPlan) return;
+  const plan = withUids(rawPlan);
   const prev = JSON.stringify(state.checks);
   allKeysForDay(state.week,state.day,plan).forEach(k=>delete state.checks[k]);
   saveState();
@@ -1009,8 +1018,9 @@ document.getElementById("resetBtn").addEventListener("click",()=>{
   showToast("Day reset", ()=>{ state.checks=JSON.parse(prev); saveState(); renderPlan(); });
 });
 document.getElementById("markAllBtn").addEventListener("click",()=>{
-  const plan = (SPLIT[String(state.week)]||{})[String(state.day)];
-  if(!plan) return;
+  const rawPlan = (SPLIT[String(state.week)]||{})[String(state.day)];
+  if(!rawPlan) return;
+  const plan = withUids(rawPlan);
   const prev = JSON.stringify(state.checks);
   allKeysForDay(state.week,state.day,plan).forEach(k=>state.checks[k]=true);
   saveState();
