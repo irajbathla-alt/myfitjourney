@@ -143,6 +143,7 @@ header.compact .brand .sub{opacity:.55}
     <div>
       <h2 id="panelTitle">Week 1 • Day 1</h2>
       <p id="panelSub">Tap sets to check them off. Progress saves automatically.</p>
+      <div class="statusRow"><span class="statusPill" id="nowBadge">Now: Warm-up</span><span class="statusPill" id="paceBadge">Pace: Starting</span></div>
     </div>
   </div>
   <div class="content" id="content"></div>
@@ -971,6 +972,8 @@ function renderPlan(){
   if(!plan){
     panelTitle.textContent=`Week ${state.week} • Day ${state.day}`;
     panelSub.textContent="This day is missing workout data.";
+    nowBadge.textContent="Now: Rest";
+    paceBadge.textContent="Pace: —";
     content.innerHTML = `<div class="empty">No workout data found for Week ${state.week} Day ${state.day}.</div>`;
     barFill.style.width="0%"; progressPct.textContent="0%"; progressDone.textContent="0"; progressTotal.textContent="0";
     return;
