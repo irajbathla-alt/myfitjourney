@@ -1012,6 +1012,7 @@ document.getElementById("resetBtn").addEventListener("click",()=>{
   const prev = JSON.stringify(state.checks);
   allKeysForDay(state.week,state.day,plan).forEach(k=>delete state.checks[k]);
   saveState();
+  updateTrustStatus(typeof navigator!=="undefined" && navigator.onLine ? "synced" : "offline");
   document.querySelectorAll(".chip.checked").forEach(el=>el.classList.remove("checked"));
   renderProgress(plan);
   showToast("Day reset", ()=>{ state.checks=JSON.parse(prev); saveState(); renderPlan(); });
@@ -1023,6 +1024,7 @@ document.getElementById("markAllBtn").addEventListener("click",()=>{
   const prev = JSON.stringify(state.checks);
   allKeysForDay(state.week,state.day,plan).forEach(k=>state.checks[k]=true);
   saveState();
+  updateTrustStatus(typeof navigator!=="undefined" && navigator.onLine ? "synced" : "offline");
   document.querySelectorAll(".chip").forEach(el=>el.classList.add("checked"));
   renderProgress(plan);
   showToast("All sets marked", ()=>{ state.checks=JSON.parse(prev); saveState(); renderPlan(); });
