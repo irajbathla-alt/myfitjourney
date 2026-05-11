@@ -8,34 +8,34 @@
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100dvh;overflow:hidden}
-body{background:#000;color:#fff;font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased;display:flex;justify-content:center;align-items:center;height:100dvh;text-align:center;position:relative}
-body::after{content:'';position:fixed;top:0;left:0;right:0;height:40%;background:linear-gradient(to bottom,rgba(255,255,255,0.02),transparent);pointer-events:none;z-index:0}
+body{background:#fff;color:#000;font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased;display:flex;justify-content:center;align-items:center;height:100dvh;text-align:center;position:relative}
+body::after{content:'';position:fixed;top:0;left:0;right:0;height:40%;background:linear-gradient(to bottom,rgba(0,0,0,0.04),transparent);pointer-events:none;z-index:0}
 
-.wrap{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;max-width:420px;padding:0 18px;gap:0}
+.wrap{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;max-width:420px;padding:14px 18px 12px;gap:0;border:1.5px solid rgba(0,0,0,.32);border-radius:16px;background:rgba(255,255,255,.96);box-shadow:0 18px 48px rgba(0,0,0,.12)}
 
 /* ── Logo ── */
-.badge{width:32px;height:32px;border-radius:9px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.04);display:flex;align-items:center;justify-content:center;margin-bottom:10px;flex-shrink:0}
-.badge svg{width:15px;height:15px;stroke:#fff;stroke-width:1.5;fill:none;opacity:0.8}
-.wordmark{font-family:'Cinzel',serif;font-weight:900;font-size:clamp(20px,5vw,32px);letter-spacing:4px;line-height:1.05;text-transform:uppercase;color:#fff}
-.wordmark-sub{font-family:'Cinzel',serif;font-size:clamp(9px,2vw,11px);letter-spacing:7px;color:rgba(255,255,255,0.2);text-transform:uppercase;margin-top:3px;margin-bottom:10px}
-.rule{width:1px;height:28px;background:linear-gradient(to bottom,transparent,rgba(255,255,255,0.25),transparent);margin:0 auto 8px}
-.tagline{font-size:9px;letter-spacing:4px;text-transform:uppercase;color:rgba(255,255,255,0.3);font-weight:400;margin-bottom:12px}
+.badge{width:32px;height:32px;border-radius:9px;border:1px solid rgba(0,0,0,0.28);background:rgba(0,0,0,0.03);display:flex;align-items:center;justify-content:center;margin-bottom:10px;flex-shrink:0}
+.badge svg{width:15px;height:15px;stroke:#111;stroke-width:1.5;fill:none;opacity:0.9}
+.wordmark{font-family:'Cinzel',serif;font-weight:900;font-size:clamp(20px,5vw,32px);letter-spacing:4px;line-height:1.05;text-transform:uppercase;color:#000}
+.wordmark-sub{font-family:'Cinzel',serif;font-size:clamp(9px,2vw,11px);letter-spacing:7px;color:rgba(0,0,0,0.45);text-transform:uppercase;margin-top:3px;margin-bottom:10px}
+.rule{width:1px;height:28px;background:linear-gradient(to bottom,transparent,rgba(0,0,0,0.22),transparent);margin:0 auto 8px}
+.tagline{font-size:9px;letter-spacing:4px;text-transform:uppercase;color:rgba(0,0,0,0.55);font-weight:400;margin-bottom:12px}
 
 /* ── Stats ── */
 .stats{display:flex;width:100%;border:1px solid rgba(255,255,255,0.1);border-radius:10px;overflow:hidden;margin-bottom:12px;flex-shrink:0}
 .stat{flex:1;padding:8px 4px;background:rgba(255,255,255,0.02)}
 .stat+.stat{border-left:1px solid rgba(255,255,255,0.1)}
-.stat-n{font-family:'Cinzel',serif;font-size:clamp(11px,2vh,15px);font-weight:700;color:#fff;margin-bottom:2px;line-height:1}
-.stat-l{font-size:8px;color:rgba(255,255,255,0.25);letter-spacing:1.5px;text-transform:uppercase}
+.stat-n{font-family:'Cinzel',serif;font-size:clamp(11px,2vh,15px);font-weight:700;color:#000;margin-bottom:2px;line-height:1}
+.stat-l{font-size:8px;color:rgba(0,0,0,0.5);letter-spacing:1.5px;text-transform:uppercase}
 
 /* ── Programs ── */
 .programs-section{width:100%;margin-bottom:12px;flex-shrink:0}
-.prog-label{font-size:8px;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,0.25);margin-bottom:7px;text-align:center}
-.tabs{display:flex;gap:6px;margin-bottom:8px}
+.prog-label{font-size:8px;letter-spacing:3px;text-transform:uppercase;color:rgba(0,0,0,0.52);margin-bottom:7px;text-align:center}
+.tabs{display:none}
 .slide-nav{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}
-.nav-btn{width:34px;height:30px;border-radius:8px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04);color:#fff;cursor:pointer}
-.tab{flex:1;padding:7px 4px;border-radius:8px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.03);font-family:'Cinzel',serif;font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,0.4);cursor:pointer;transition:all 0.2s ease;text-align:center}
-.tab:hover{background:rgba(255,255,255,0.07);color:rgba(255,255,255,0.7)}
+.nav-btn{width:34px;height:30px;border-radius:8px;border:1px solid rgba(0,0,0,.2);background:rgba(0,0,0,.03);color:#000;cursor:pointer}
+.tab{flex:1;padding:7px 4px;border-radius:8px;border:1px solid rgba(0,0,0,0.24);background:rgba(255,255,255,0.95);font-family:'Cinzel',serif;font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(0,0,0,0.62);cursor:pointer;transition:all 0.2s ease;text-align:center}
+.tab:hover{background:rgba(0,0,0,0.06);color:rgba(0,0,0,0.8)}
 .tab.active-strength{background:rgba(74,144,217,0.18);border-color:rgba(74,144,217,0.55);color:#82b4e8}
 .tab.active-shred{background:rgba(224,92,42,0.18);border-color:rgba(224,92,42,0.55);color:#f0a070}
 .tab.active-bikini{background:rgba(217,96,154,0.18);border-color:rgba(217,96,154,0.55);color:#f0a0c8}
@@ -43,7 +43,7 @@ body::after{content:'';position:fixed;top:0;left:0;right:0;height:40%;background
 .prog-card.visible{display:block}
 .prog-card-title{font-family:'Cinzel',serif;font-size:13px;font-weight:900;letter-spacing:1px;margin-bottom:2px}
 .prog-card-sub{font-size:8px;letter-spacing:2px;text-transform:uppercase;margin-bottom:7px;opacity:0.5}
-.prog-card-body{font-size:10px;color:rgba(255,255,255,0.55);line-height:1.5;margin-bottom:8px}
+.prog-card-body{font-size:10px;color:rgba(0,0,0,0.65);line-height:1.5;margin-bottom:8px}
 .prog-pills{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px}
 .prog-pill{font-size:8px;letter-spacing:1px;text-transform:uppercase;padding:3px 8px;border-radius:999px;border:1px solid rgba(255,255,255,0.12);color:rgba(255,255,255,0.45)}
 .prog-dl{width:100%;padding:9px;border-radius:9px;border:none;font-family:'Cinzel',serif;font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:all 0.2s ease;display:flex;align-items:center;justify-content:center;gap:6px}
@@ -53,15 +53,21 @@ body::after{content:'';position:fixed;top:0;left:0;right:0;height:40%;background
 .prog-dl-bikini{background:rgba(217,96,154,0.2);border:1px solid rgba(217,96,154,0.45);color:#f0a0c8}
 
 /* ── Buttons ── */
-.btn-login{width:100%;padding:11px;border-radius:11px;border:none;font-family:'Cinzel',serif;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;background:#fff;color:#000;transition:all 0.25s ease;display:block;margin-bottom:8px}
-.btn-login:hover{background:rgba(255,255,255,0.88);transform:translateY(-2px);box-shadow:0 12px 40px rgba(255,255,255,0.12)}
+.btn-login{width:100%;padding:11px;border-radius:11px;border:1px solid rgba(74,144,217,.45);font-family:'Cinzel',serif;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;background:#e8f3ff;color:#000;transition:all 0.25s ease;display:block;margin-bottom:8px;box-shadow:0 8px 26px rgba(74,144,217,.2)}
+.btn-login:hover{background:#d8eaff;transform:translateY(-2px);box-shadow:0 12px 36px rgba(74,144,217,.34)}
 .btn-login:active{transform:translateY(0)}
 .btn-subscribe{width:100%;padding:11px;border-radius:11px;border:none;font-family:'Cinzel',serif;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;color:#000;text-decoration:none;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;background:#00D97E;animation:greenPulse 3s 1.2s ease-in-out infinite;transition:transform 0.25s}
 @keyframes greenPulse{0%,100%{box-shadow:0 4px 24px rgba(0,217,126,0.3)}50%{box-shadow:0 8px 44px rgba(0,217,126,0.58)}}
 .btn-subscribe::before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent 0%,rgba(255,255,255,0.22) 50%,transparent 100%);transform:translateX(-100%);animation:shimmer 2.8s 1.5s ease-in-out infinite}
 @keyframes shimmer{0%{transform:translateX(-100%)}55%,100%{transform:translateX(120%)}}
 .btn-subscribe:hover{transform:translateY(-2px)}
-.cta-note{margin-top:7px;font-size:9px;color:rgba(255,255,255,0.18)}
+.cta-note{margin-top:7px;font-size:9px;color:rgba(0,0,0,0.45)}
+.premium-stack{width:100%;margin:8px 0 10px;padding:10px;border:1px solid rgba(255,255,255,.1);border-radius:10px;background:linear-gradient(145deg,rgba(255,255,255,.045),rgba(255,255,255,.015));text-align:left}
+.premium-stack-title{font-family:'Cinzel',serif;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.72);margin-bottom:7px}
+.premium-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+.premium-item{padding:6px;border:1px solid rgba(255,255,255,.08);border-radius:8px;background:rgba(255,255,255,.02)}
+.premium-item b{display:block;font-size:8px;letter-spacing:1.2px;text-transform:uppercase;color:rgba(255,255,255,.85);margin-bottom:2px}
+.premium-item span{font-size:8px;color:rgba(255,255,255,.5);line-height:1.35}
 
 @keyframes up{0%{opacity:0;transform:translateY(14px)}100%{opacity:1;transform:translateY(0)}}
 .wrap > *{animation:up 0.7s cubic-bezier(0.16,1,0.3,1) both}
@@ -96,8 +102,18 @@ body::after{content:'';position:fixed;top:0;left:0;right:0;height:40%;background
   <button class="btn-login" onclick="window.location.href='login.html'">Member Login</button>
   <a href="https://square.link/u/E4LYxGUQ" target="_blank" class="btn-subscribe">Subscribe &mdash; $2 / Week</a>
   <div class="cta-note">Weekly Billing &nbsp;&middot;&nbsp; Cancel Anytime &nbsp;&middot;&nbsp; Access Within 24hrs</div>
+  <div class="premium-stack">
+    <div class="premium-stack-title">Premium Platform Service</div>
+    <div class="premium-grid">
+      <div class="premium-item"><b>Smart Onboarding</b><span>Automated intake + instant program matching.</span></div>
+      <div class="premium-item"><b>Coach Dashboards</b><span>Client status tracking and renewals in one portal.</span></div>
+      <div class="premium-item"><b>Weekly Intelligence</b><span>Progress check-ins with adaptive plan logic.</span></div>
+      <div class="premium-item"><b>White-Glove Support</b><span>Priority response and premium member concierge.</span></div>
+    </div>
+  </div>
 </div>
 
+<script>window.MFJ_DISABLE_POLISH = true;</script>
 <script src="shared-config.js"></script>
 <script>
 const PDFS = {
