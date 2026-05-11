@@ -62,6 +62,12 @@ body::after{content:'';position:fixed;top:0;left:0;right:0;height:40%;background
 @keyframes shimmer{0%{transform:translateX(-100%)}55%,100%{transform:translateX(120%)}}
 .btn-subscribe:hover{transform:translateY(-2px)}
 .cta-note{margin-top:7px;font-size:9px;color:rgba(255,255,255,0.18)}
+.premium-stack{width:100%;margin:8px 0 10px;padding:10px;border:1px solid rgba(255,255,255,.1);border-radius:10px;background:linear-gradient(145deg,rgba(255,255,255,.045),rgba(255,255,255,.015));text-align:left}
+.premium-stack-title{font-family:'Cinzel',serif;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.72);margin-bottom:7px}
+.premium-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+.premium-item{padding:6px;border:1px solid rgba(255,255,255,.08);border-radius:8px;background:rgba(255,255,255,.02)}
+.premium-item b{display:block;font-size:8px;letter-spacing:1.2px;text-transform:uppercase;color:rgba(255,255,255,.85);margin-bottom:2px}
+.premium-item span{font-size:8px;color:rgba(255,255,255,.5);line-height:1.35}
 
 @keyframes up{0%{opacity:0;transform:translateY(14px)}100%{opacity:1;transform:translateY(0)}}
 .wrap > *{animation:up 0.7s cubic-bezier(0.16,1,0.3,1) both}
@@ -96,6 +102,15 @@ body::after{content:'';position:fixed;top:0;left:0;right:0;height:40%;background
   <button class="btn-login" onclick="window.location.href='login.html'">Member Login</button>
   <a href="https://square.link/u/E4LYxGUQ" target="_blank" class="btn-subscribe">Subscribe &mdash; $2 / Week</a>
   <div class="cta-note">Weekly Billing &nbsp;&middot;&nbsp; Cancel Anytime &nbsp;&middot;&nbsp; Access Within 24hrs</div>
+  <div class="premium-stack">
+    <div class="premium-stack-title">Premium Platform Service</div>
+    <div class="premium-grid">
+      <div class="premium-item"><b>Smart Onboarding</b><span>Automated intake + instant program matching.</span></div>
+      <div class="premium-item"><b>Coach Dashboards</b><span>Client status tracking and renewals in one portal.</span></div>
+      <div class="premium-item"><b>Weekly Intelligence</b><span>Progress check-ins with adaptive plan logic.</span></div>
+      <div class="premium-item"><b>White-Glove Support</b><span>Priority response and premium member concierge.</span></div>
+    </div>
+  </div>
 </div>
 
 <script src="shared-config.js"></script>
