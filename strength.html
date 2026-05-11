@@ -95,7 +95,7 @@ header.compact .brand .sub{opacity:.55}
   <div class="actions">
     <label class="pill" style="cursor:default">
       <span class="dot"></span><span>Week</span>
-      <div class="selectWrap"><select id="weekSelect" aria-label="Week">
+      <div class="selectWrap"><select id="weekSelect" aria-label="Week" disabled>
         
         
         
@@ -125,12 +125,12 @@ header.compact .brand .sub{opacity:.55}
 
     <label class="pill" style="cursor:default">
       <span class="dot" style="background:var(--warn)"></span><span>Day</span>
-      <div class="selectWrap"><select id="daySelect" aria-label="Day">
+      <div class="selectWrap"><select id="daySelect" aria-label="Day" disabled>
         <option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option>
         <option value="5">5</option><option value="6">6</option><option value="7">7</option>
       </select></div>
     </label>
-    <div class="pill" id="exerciseDateTab"><span class="dot"></span><span>Exercise: — (W1 • D1)</span></div>
+    <div class="pill" id="exerciseDateTab"><span class="dot"></span><span>Exercise: Loading…</span></div>
     <button class="btn ghost" id="resetBtn">Reset Day</button>
     <button class="btn primary" id="markAllBtn">Mark All</button>
   </div>
@@ -139,7 +139,7 @@ header.compact .brand .sub{opacity:.55}
 <section class="panel">
   <div class="panelHead">
     <div>
-      <h2 id="panelTitle">Week 1 • Day 1</h2>
+      <h2 id="panelTitle">Loading workout…</h2>
     </div>
   </div>
   <div class="content" id="content"></div>
@@ -961,6 +961,8 @@ function renderProgress(plan){
 }
 
 function renderPlan(){
+  weekSelect.disabled=false;
+  daySelect.disabled=false;
   const week=String(state.week), day=String(state.day);
   const plan = (SPLIT[week]||{})[day];
   if(!plan){
