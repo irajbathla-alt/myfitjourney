@@ -1019,6 +1019,7 @@ document.getElementById("resetBtn").addEventListener("click",()=>{
   updateTrustStatus(typeof navigator!=="undefined" && navigator.onLine ? "synced" : "offline");
   document.querySelectorAll(".chip.checked").forEach(el=>el.classList.remove("checked"));
   renderProgress(plan);
+  renderPlan();
   showToast("Day reset", ()=>{ state.checks=JSON.parse(prev); saveState(); renderPlan(); });
 });
 document.getElementById("markAllBtn").addEventListener("click",()=>{
@@ -1031,6 +1032,7 @@ document.getElementById("markAllBtn").addEventListener("click",()=>{
   updateTrustStatus(typeof navigator!=="undefined" && navigator.onLine ? "synced" : "offline");
   document.querySelectorAll(".chip").forEach(el=>el.classList.add("checked"));
   renderProgress(plan);
+  renderPlan();
   showToast("All sets marked", ()=>{ state.checks=JSON.parse(prev); saveState(); renderPlan(); });
 });
 undoBtn.addEventListener("click", ()=>{ if(undoSnapshot){ undoSnapshot(); toast.classList.remove("show"); undoSnapshot=null; } });

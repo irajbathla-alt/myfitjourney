@@ -98,6 +98,7 @@ window.getMfjPrograms = function(){
 })();
 
 (function enableMfjFocusSession(){
+  if (!window.MFJ_ENABLE_FOCUS_SESSION) return;
   function onReady(fn){
     if(document.readyState === "loading") document.addEventListener("DOMContentLoaded", fn);
     else fn();
