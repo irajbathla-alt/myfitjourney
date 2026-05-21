@@ -96,3 +96,145 @@ window.getMfjPrograms = function(){
     }
   });
 })();
+
+(function enableMfjFocusSession(){
+  function onReady(fn){
+    if(document.readyState === "loading") document.addEventListener("DOMContentLoaded", fn);
+    else fn();
+  }
+
+  function formatSecs(total){
+    const m = Math.floor(total/60);
+    const s = total % 60;
+    return `${m}:${String(s).padStart(2,'0')}`;
+  }
+
+  onReady(function(){
+    const app = document.querySelector('.app');
+    const content = document.getElementById('content');
+    if(!app || !content) return;
+
+    const MODE_KEY = 'mfj_focus_session_mode';
+    const REST_KEY = 'mfj_focus_rest_seconds';
+    const DEFAULT_REST = Number(localStorage.getItem(REST_KEY) || '75') || 75;
+
+    const style = document.createElement('style');
+    style.textContent = `
+      .mfj-focus-toggle{position:fixed;right:14px;bottom:calc(env(safe-area-inset-bottom) + 16px);z-index:120;border:1px solid rgba(255,255,255,.2);background:rgba(5,5,6,.92);color:#fff;border-radius:999px;padding:10px 14px;font-size:11px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;cursor:pointer;box-shadow:0 10px 28px rgba(0,0,0,.4)}
+      .mfj-focus-session .card{opacity:.34;transform:scale(.985);transition:all .2s ease}
+      .mfj-focus-session .card.mfj-focus-current{opacity:1;transform:scale(1);border-color:rgba(0,217,126,.55)!important;box-shadow:0 0 0 1px rgba(0,217,126,.2),0 14px 30px rgba(0,0,0,.45)!important}
+      .mfj-focus-hud{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom) + 70px);width:min(94vw,620px);z-index:121;background:rgba(8,8,10,.95);border:1px solid rgba(255,255,255,.18);border-radius:16px;padding:10px 12px;box-shadow:0 16px 40px rgba(0,0,0,.45);display:none}
+      .mfj-focus-session .mfj-focus-hud{display:block}
+      .mfj-focus-top{display:flex;align-items:center;justify-content:space-between;gap:10px}
+      .mfj-focus-title{font-size:11px;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,.65)}
+      .mfj-focus-next{font-size:14px;font-weight:800;color:#fff;line-height:1.2;margin-top:4px}
+      .mfj-focus-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:10px}
+      .mfj-mini-btn{border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.08);color:#fff;border-radius:10px;padding:8px 10px;font-size:11px;font-weight:700;cursor:pointer}
+      .mfj-mini-btn.primary{background:#00D97E;color:#001b10;border-color:rgba(0,0,0,.3)}
+      .mfj-timer{font-size:18px;font-weight:900;min-width:58px;text-align:center;color:#00D97E}
+    `;
+    document.head.appendChild(style);
+
+    const toggle = document.createElement('button');
+    toggle.className = 'mfj-focus-toggle';
+    toggle.type = 'button';
+
+    const hud = document.createElement('div');
+    hud.className = 'mfj-focus-hud';
+    hud.innerHTML = `
+      <div class="mfj-focus-top">
+        <div>
+          <div class="mfj-focus-title">Focus Session</div>
+          <div class="mfj-focus-next" id="mfjFocusNext">Loading next set…</div>
+        </div>
+        <div class="mfj-timer" id="mfjFocusTimer">0:00</div>
+      </div>
+      <div class="mfj-focus-row">
+        <button class="mfj-mini-btn primary" id="mfjFocusDone">Complete Set</button>
+        <button class="mfj-mini-btn" id="mfjFocusStartRest">Start Rest</button>
+        <button class="mfj-mini-btn" id="mfjFocusAdd15">+15s</button>
+        <button class="mfj-mini-btn" id="mfjFocusSkip">Skip Rest</button>
+      </div>
+    `;
+    document.body.appendChild(toggle);
+    document.body.appendChild(hud);
+
+    const nextEl = hud.querySelector('#mfjFocusNext');
+    const timerEl = hud.querySelector('#mfjFocusTimer');
+    const doneBtn = hud.querySelector('#mfjFocusDone');
+    const restBtn = hud.querySelector('#mfjFocusStartRest');
+    const addBtn = hud.querySelector('#mfjFocusAdd15');
+    const skipBtn = hud.querySelector('#mfjFocusSkip');
+
+    let restDefault = DEFAULT_REST;
+    let timer = null;
+    let remaining = 0;
+
+    function getNextChip(){ return document.querySelector('.content .chip:not(.checked)'); }
+
+    function updateFocusCard(){
+      const cards = [...document.querySelectorAll('.content .card')];
+      cards.forEach(c=>c.classList.remove('mfj-focus-current'));
+      const next = getNextChip();
+      const target = next ? next.closest('.card') : cards[0];
+      if(target) target.classList.add('mfj-focus-current');
+      if(next){
+        const card = next.closest('.card');
+        const name = card ? (card.querySelector('.name')?.textContent || 'Exercise') : 'Exercise';
+        nextEl.textContent = `${name} • ${next.textContent.trim()}`;
+      } else {
+        nextEl.textContent = 'All sets complete ✅';
+      }
+    }
+
+    function setMode(on){
+      document.body.classList.toggle('mfj-focus-session', on);
+      toggle.textContent = on ? 'Exit Focus' : 'Focus Session';
+      localStorage.setItem(MODE_KEY, on ? '1' : '0');
+      if(on) updateFocusCard();
+    }
+
+    function stopTimer(){
+      if(timer) clearInterval(timer);
+      timer = null;
+      remaining = 0;
+      timerEl.textContent = '0:00';
+    }
+
+    function startTimer(seconds){
+      if(timer) clearInterval(timer);
+      remaining = Math.max(0, seconds|0);
+      timerEl.textContent = formatSecs(remaining);
+      timer = setInterval(function(){
+        remaining -= 1;
+        timerEl.textContent = formatSecs(Math.max(0, remaining));
+        if(remaining <= 0){
+          clearInterval(timer); timer = null;
+          timerEl.textContent = 'Done';
+        }
+      }, 1000);
+    }
+
+    toggle.addEventListener('click', ()=>setMode(!document.body.classList.contains('mfj-focus-session')));
+    doneBtn.addEventListener('click', function(){
+      const next = getNextChip();
+      if(next) next.click();
+      setTimeout(updateFocusCard, 0);
+      startTimer(restDefault);
+    });
+    restBtn.addEventListener('click', ()=>startTimer(restDefault));
+    addBtn.addEventListener('click', function(){
+      const base = timer ? remaining : restDefault;
+      startTimer(base + 15);
+    });
+    skipBtn.addEventListener('click', stopTimer);
+
+    content.addEventListener('click', function(ev){
+      if(!ev.target.closest('.chip')) return;
+      setTimeout(updateFocusCard, 0);
+    });
+
+    const initial = localStorage.getItem(MODE_KEY) === '1';
+    setMode(initial);
+  });
+})();
