@@ -240,15 +240,15 @@ const progressTotal=document.getElementById("progressTotal");
 const weekSelect=document.getElementById("weekSelect");
 const daySelect=document.getElementById("daySelect");
 
-function keyFor(week,day,name,idx){return `w${week}|d${day}|${name}|${idx}`;}
+function keyFor(week,day,uid,idx){return `w${week}|d${day}|${uid}|${idx}`;}
 
-function chipHTML(week,day,name,i,label){
-  const k=keyFor(week,day,name,i);
+function chipHTML(week,day,uid,i,label){
+  const k=keyFor(week,day,uid,i);
   const checked=!!state.checks[k];
   return `<div class="chip ${checked?"checked":""}" data-key="${k}"><span class="dot"></span><span>${safe(label)}</span></div>`;
 }
 function card(week,day,item){
-  const chips=(item.sets||[]).map((s,i)=>chipHTML(week,day,item.name,i,`Set ${i+1}: ${s}`)).join("");
+  const chips=(item.sets||[]).map((s,i)=>chipHTML(week,day,item.uid,i,`Set ${i+1}: ${s}`)).join("");
   return `<div class="card"><div class="cardInner"><div class="thumb">${svgIcon(item.name)}<div class="shine"></div></div><div class="info"><p class="name">${safe(item.name)}</p><p class="detail">${safe((item.sets||[]).join(" • "))}</p><div class="sets">${chips}</div></div></div></div>`;
 }
 function section(week,day,title,items,hint){
@@ -256,8 +256,16 @@ function section(week,day,title,items,hint){
 }
 function allKeysForDay(week,day,plan){
   const keys=[];
-  [plan.morning,plan.workout,plan.finish].flat().forEach(item=> (item.sets||[]).forEach((_,i)=>keys.push(keyFor(week,day,item.name,i)) ));
+  [plan.morning,plan.workout,plan.finish].flat().forEach(item=> (item.sets||[]).forEach((_,i)=>keys.push(keyFor(week,day,item.uid,i)) ));
   return keys;
+}
+function withUids(plan){
+  return {
+    ...plan,
+    morning:(plan.morning||[]).map((item,idx)=>({...item,uid:`m-${idx}-${item.name}`})),
+    workout:(plan.workout||[]).map((item,idx)=>({...item,uid:`w-${idx}-${item.name}`})),
+    finish:(plan.finish||[]).map((item,idx)=>({...item,uid:`f-${idx}-${item.name}`}))
+  };
 }
 function renderProgress(plan){
   const keys=allKeysForDay(state.week,state.day,plan);
@@ -289,9 +297,10 @@ function renderPlan(){
   panelTitle.textContent=`Week ${state.week} • Day ${state.day}`;
   panelSub.textContent=`Plan: ${plan.title}. Tap sets to check them off.`;
 
-  const morning=plan.morning||[];
-  const workout=plan.workout||[];
-  const finish=plan.finish||[];
+  const normalizedPlan = withUids(plan);
+  const morning=normalizedPlan.morning;
+  const workout=normalizedPlan.workout;
+  const finish=normalizedPlan.finish;
 
   let out="";
   if(morning.length) out += section(state.week,state.day,"Morning",morning,"start smooth");
@@ -305,9 +314,9 @@ function renderPlan(){
     state.checks[k]=!state.checks[k];
     chip.classList.toggle("checked", !!state.checks[k]);
     saveState();
-    renderProgress(plan);
+    renderProgress(normalizedPlan);
   };
-  renderProgress(plan);
+  renderProgress(normalizedPlan);
 }
 
 weekSelect.value = String(state.week);
@@ -316,16 +325,18 @@ weekSelect.addEventListener("change", ()=>{ state.week = Number(weekSelect.value
 daySelect.addEventListener("change", ()=>{ state.day = Number(daySelect.value); saveState(); renderPlan(); window.scrollTo({top:0,behavior:"smooth"}); });
 
 document.getElementById("resetBtn").addEventListener("click",()=>{
-  const plan = (SPLIT[String(state.week)]||{})[String(state.day)];
-  if(!plan) return;
+  const rawPlan = (SPLIT[String(state.week)]||{})[String(state.day)];
+  if(!rawPlan) return;
+  const plan = withUids(rawPlan);
   allKeysForDay(state.week,state.day,plan).forEach(k=>delete state.checks[k]);
   saveState();
   document.querySelectorAll(".chip.checked").forEach(el=>el.classList.remove("checked"));
   renderProgress(plan);
 });
 document.getElementById("markAllBtn").addEventListener("click",()=>{
-  const plan = (SPLIT[String(state.week)]||{})[String(state.day)];
-  if(!plan) return;
+  const rawPlan = (SPLIT[String(state.week)]||{})[String(state.day)];
+  if(!rawPlan) return;
+  const plan = withUids(rawPlan);
   allKeysForDay(state.week,state.day,plan).forEach(k=>state.checks[k]=true);
   saveState();
   document.querySelectorAll(".chip").forEach(el=>el.classList.add("checked"));
