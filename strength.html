@@ -858,6 +858,7 @@ function loadState() {
 let state = loadState();
 let syncTimer = null;
 let syncInFlight = false;
+let syncPending = false;
 
 function persistLocalState() {
   try {
@@ -870,11 +871,25 @@ function persistLocalState() {
 }
 
 async function saveStateToCloud() {
-  if (syncInFlight) return;
+  if (syncInFlight) {
+    syncPending = true;
+    return;
+  }
   const memberEmail = (sessionStorage.getItem("mfj_last_email") || localStorage.getItem("mfj_last_email") || "").trim().toLowerCase();
   if (!memberEmail || typeof window.mfjCallApi !== "function") return;
   syncInFlight = true;
-  try { await window.mfjCallApi("save_progress", { email: memberEmail, progressJson: JSON.stringify(state) }, 8000); } catch (_err) {} finally { syncInFlight = false; }
+  syncPending = false;
+  try {
+    await window.mfjCallApi("save_progress", { email: memberEmail, progressJson: JSON.stringify(state) }, 8000);
+  } catch (_err) {
+    syncPending = true;
+  } finally {
+    syncInFlight = false;
+  }
+  if (syncPending) {
+    if (syncTimer) clearTimeout(syncTimer);
+    syncTimer = setTimeout(saveStateToCloud, 250);
+  }
 }
 
 function saveState() {
