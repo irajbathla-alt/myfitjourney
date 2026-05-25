@@ -1,0 +1,763 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+<title>My Fit Journey — Strength Builder</title>
+<meta name="theme-color" content="#ffffff"/>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@700&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#ffffff;--panel:rgba(0,0,0,.04);--panel2:rgba(0,0,0,.02);
+  --text:#0a0a0a;--muted:#5a5a5a;--muted2:#aaa;
+  --shadow:0 12px 32px rgba(0,0,0,.10);
+  --r1:18px;--r2:26px;
+  --good:#2EA8FF;--warn:#f59e0b;--accent:#222;
+  --glow:0 0 0 1px rgba(0,0,0,.08),0 10px 22px rgba(0,0,0,.10);
+  --glow-soft:0 4px 14px rgba(0,0,0,.07);
+  --dur-fast:.18s;--dur-med:.32s;--ease-standard:cubic-bezier(.2,.65,.2,1);
+  /* muscle group palette */
+  --c-legs:#a78bfa;--c-chest:#f472b6;--c-back:#34d399;--c-arms:#fb923c;--c-shoulders:#60a5fa;--c-abs:#facc15;--c-cardio:#94a3b8;
+}
+*{box-sizing:border-box} html,body{height:100%}
+body{margin:0;font-family:'DM Sans',ui-sans-serif,system-ui,-apple-system,sans-serif;background:#f8f8f8;color:var(--text);-webkit-font-smoothing:antialiased;overflow-x:hidden;}
+.app{max-width:620px;margin:0 auto;min-height:100%;padding:calc(env(safe-area-inset-top) + 14px) 14px calc(env(safe-area-inset-bottom) + 100px);animation:fadeIn .4s ease;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── HEADER ── */
+header{position:sticky;top:0;z-index:50;margin:-14px -14px 16px;padding:16px 16px 12px;
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  background:rgba(255,255,255,.92);
+  border-bottom:1px solid rgba(0,0,0,.07);
+  transition:padding var(--dur-med) var(--ease-standard);}
+header.compact{padding:8px 16px 8px;}
+header.compact .brand h1{font-size:22px;}
+header.compact .brand .sub{opacity:0;height:0;margin:0;}
+
+.brand{display:flex;flex-direction:column;align-items:center;gap:4px;padding:2px 0 8px;}
+.brand h1{margin:0;font-size:28px;line-height:1;font-weight:700;font-family:'Libre Baskerville','Times New Roman',serif;
+  background:linear-gradient(135deg,#0a0a0a 0%,#444 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  transition:font-size .3s ease;}
+.brand .sub{margin:0;font-size:11px;color:var(--muted2);letter-spacing:.3px;transition:all .3s ease;}
+
+/* mascot strip */
+.mascotStrip{display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:6px;}
+.mascotWrap{width:36px;height:36px;position:relative;}
+.mascotWrap svg{width:36px;height:36px;}
+.mascotQuip{font-size:11px;color:var(--muted);font-style:italic;max-width:220px;text-align:center;line-height:1.3;}
+
+/* ── CONTROLS ── */
+.actions{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;width:100%;}
+.pill{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;
+  border:1px solid rgba(0,0,0,.10);background:rgba(0,0,0,.04);color:var(--text);
+  font-weight:600;font-size:12px;user-select:none;white-space:nowrap;}
+.pill .dot{width:8px;height:8px;border-radius:50%;}
+.selectWrap{position:relative;display:inline-flex;align-items:center;margin-left:4px}
+.selectWrap::after{content:"▾";position:absolute;right:8px;pointer-events:none;font-size:12px;color:rgba(0,0,0,.40);}
+.selectWrap select{appearance:none;background:transparent;color:var(--text);border:none;
+  padding:0 22px 0 0;font-weight:700;font-size:13px;outline:none;cursor:pointer;}
+.selectWrap select option{background:#fff;}
+.btn{appearance:none;border:1px solid rgba(0,0,0,.10);background:#fff;color:var(--text);
+  padding:8px 14px;border-radius:999px;font-weight:600;font-size:12px;cursor:pointer;white-space:nowrap;
+  box-shadow:0 1px 3px rgba(0,0,0,.06);
+  transition:transform var(--dur-fast) var(--ease-standard),box-shadow var(--dur-fast) var(--ease-standard);}
+.btn:hover{box-shadow:0 3px 10px rgba(0,0,0,.12);transform:translateY(-1px);}
+.btn:active{transform:scale(.97);}
+.btn.primary{background:var(--text);color:#fff;border-color:var(--text);}
+.btn.ghost{background:transparent;border-color:rgba(0,0,0,.08);color:var(--muted);}
+
+/* ── WEEK STRIP ── */
+.weekStrip{display:flex;gap:4px;margin:0 -14px 14px;padding:8px 14px;overflow-x:auto;scrollbar-width:none;
+  background:#fff;border-bottom:1px solid rgba(0,0,0,.06);}
+.weekStrip::-webkit-scrollbar{display:none}
+.dayDot{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;gap:3px;
+  cursor:pointer;padding:8px 10px;border-radius:14px;border:1.5px solid transparent;
+  transition:all .15s ease;min-width:44px;}
+.dayDot:hover{background:rgba(0,0,0,.04);}
+.dayDot.active{background:rgba(46,168,255,.06);border-color:rgba(46,168,255,.40);}
+.dayDot.restDay{opacity:.32;pointer-events:none;}
+.dayDot .dLabel{font-size:9px;font-weight:600;color:var(--muted2);text-transform:uppercase;letter-spacing:.4px;}
+.dayDot .dNum{font-size:16px;font-weight:700;color:var(--muted);line-height:1;}
+.dayDot.active .dNum{color:var(--good);}
+.dayDot .dPips{display:flex;gap:2px;align-items:center;height:6px;}
+.dPip{width:5px;height:5px;border-radius:50%;background:rgba(0,0,0,.10);transition:background .2s ease;}
+.dPip.done{background:var(--good);}
+.dPip.empty{background:transparent;border:1px solid rgba(0,0,0,.15);}
+
+/* ── MILESTONE BANNER ── */
+.milestoneBanner{margin:-8px 0 12px;padding:10px 14px;
+  background:linear-gradient(135deg,rgba(46,168,255,.07),rgba(46,168,255,.02));
+  border:1.5px solid rgba(46,168,255,.20);border-radius:var(--r1);
+  display:flex;align-items:center;gap:8px;font-size:12px;font-weight:700;color:var(--good);
+  opacity:0;transform:translateY(-8px);transition:opacity .3s ease,transform .3s ease;pointer-events:none;}
+.milestoneBanner.show{opacity:1;transform:translateY(0);pointer-events:auto;}
+.milestoneBanner .mIcon{font-size:20px;line-height:1;animation:bounce .5s ease;}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+
+/* ── PANEL ── */
+.panel{background:#fff;border:1px solid rgba(0,0,0,.07);border-radius:var(--r2);
+  box-shadow:var(--shadow);overflow:hidden;position:relative;}
+.panelHead{padding:16px 16px 12px;border-bottom:1px solid rgba(0,0,0,.06);
+  display:flex;align-items:flex-start;justify-content:space-between;gap:12px;}
+.panelHead h2{margin:0;font-size:15px;font-weight:700;letter-spacing:.1px;line-height:1.3;text-transform:uppercase;}
+.panelHead p{display:none}
+
+.phaseBadge{display:inline-flex;align-items:center;gap:5px;padding:5px 11px;
+  background:rgba(0,0,0,.05);border:1px solid rgba(0,0,0,.09);border-radius:999px;
+  font-size:10px;font-weight:700;color:var(--muted);letter-spacing:.5px;text-transform:uppercase;white-space:nowrap;flex-shrink:0;}
+.phaseDot{width:6px;height:6px;border-radius:50%;background:var(--muted2);}
+
+.content{padding:12px;display:flex;flex-direction:column;gap:8px;}
+.sectionTitle{font-size:10px;color:var(--muted2);letter-spacing:.5px;text-transform:uppercase;
+  margin:6px 2px 0;display:flex;align-items:center;gap:8px;}
+.sectionTitle::after{content:"";flex:1;height:1px;background:rgba(0,0,0,.07);}
+
+/* ── CARDS ── */
+.card{background:#fff;border:1.5px solid rgba(0,0,0,.07);border-radius:var(--r1);
+  overflow:hidden;box-shadow:var(--glow-soft);
+  transition:border-color .2s ease,box-shadow .2s ease,opacity .2s ease,filter .2s ease;
+  animation:cardIn .4s ease both;}
+.card.active{border-color:rgba(46,168,255,.50);box-shadow:0 0 0 1px rgba(46,168,255,.12),0 8px 24px rgba(46,168,255,.10);}
+.card.done{opacity:.52;filter:saturate(.5);}
+.card.next{border-color:rgba(0,0,0,.12);}
+.content .card:nth-child(2){animation-delay:.04s}.content .card:nth-child(3){animation-delay:.08s}
+.content .card:nth-child(4){animation-delay:.12s}.content .card:nth-child(5){animation-delay:.16s}
+.content .card:nth-child(6){animation-delay:.20s}.content .card:nth-child(7){animation-delay:.24s}
+@keyframes cardIn{from{opacity:0;transform:translateY(10px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}
+
+.cardInner{display:flex;gap:12px;padding:12px;align-items:flex-start;}
+.thumb{width:72px;height:72px;border-radius:16px;overflow:hidden;flex:0 0 auto;position:relative;
+  display:flex;align-items:center;justify-content:center;}
+.thumb svg{width:100%;height:100%;}
+.thumb .shine{position:absolute;inset:-40%;
+  background:linear-gradient(110deg, transparent 35%, rgba(255,255,255,.65) 45%, transparent 55%);
+  animation:shine 5s ease-in-out infinite;pointer-events:none;}
+@keyframes shine{0%,60%{transform:translateX(-35%)}100%{transform:translateX(50%)}}
+
+.info{min-width:0;flex:1;}
+.name{margin:0 0 3px;font-weight:700;font-size:14px;line-height:1.25;text-transform:uppercase;letter-spacing:.1px;}
+.detail{margin:0 0 8px;color:var(--muted2);font-size:11px;line-height:1.4;}
+.sets{display:flex;gap:6px;flex-wrap:wrap;}
+
+/* ── CHIPS ── */
+.chip{display:inline-flex;align-items:center;gap:7px;padding:7px 10px;border-radius:999px;
+  background:rgba(0,0,0,.04);border:1.5px solid rgba(0,0,0,.09);font-size:11px;font-weight:600;
+  color:var(--text);cursor:pointer;user-select:none;white-space:nowrap;
+  transition:transform .15s ease,background .15s ease,border-color .15s ease,box-shadow .15s ease;}
+.chip:hover{border-color:rgba(0,0,0,.18);box-shadow:0 3px 10px rgba(0,0,0,.08);transform:translateY(-1px);}
+.chip:active{transform:scale(.96);}
+.chip .dot{width:9px;height:9px;border-radius:50%;border:1.5px solid rgba(0,0,0,.22);background:transparent;flex-shrink:0;}
+.chip.checked{background:rgba(46,168,255,.07);border-color:rgba(46,168,255,.40);color:#1e88d4;animation:pop .22s ease;}
+.chip.checked .dot{background:var(--good);border-color:var(--good);box-shadow:0 0 0 3px rgba(46,168,255,.15);}
+@keyframes pop{0%{transform:scale(.94)}60%{transform:scale(1.05)}100%{transform:scale(1)}}
+
+/* ── PROGRESS ── */
+.progressWrap{padding:12px 14px 14px;border-top:1px solid rgba(0,0,0,.06);
+  background:rgba(255,255,255,.95);position:sticky;bottom:0;
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);}
+.progressWrap.milestone{box-shadow:0 -2px 0 rgba(46,168,255,.15),0 -12px 28px rgba(46,168,255,.08);}
+.barWrap{display:flex;align-items:center;gap:10px;}
+.bar{flex:1;height:10px;background:rgba(0,0,0,.06);border-radius:999px;overflow:hidden;}
+.bar>div{height:100%;width:0%;border-radius:999px;
+  background:linear-gradient(90deg,#7dd3fc,#2EA8FF,#0ea5e9);
+  background-size:200% 100%;transition:width .3s var(--ease-standard);}
+.bar>div.shine{animation:progressShine 1s linear 1;}
+@keyframes progressShine{0%{background-position:0%}100%{background-position:200%}}
+.barMascot{font-size:20px;transition:transform .3s ease;line-height:1;cursor:default;user-select:none;}
+.barMascot.flex{animation:mascotFlex .5s ease;}
+@keyframes mascotFlex{0%{transform:scale(1) rotate(0deg)}30%{transform:scale(1.3) rotate(-10deg)}60%{transform:scale(1.2) rotate(8deg)}100%{transform:scale(1) rotate(0deg)}}
+.progressMeta{display:flex;justify-content:space-between;align-items:center;margin-top:7px;font-size:12px;color:var(--muted);gap:10px;flex-wrap:wrap;}
+.progressMeta b{color:var(--text);}
+
+/* ── TOAST ── */
+.toast{position:fixed;left:50%;transform:translateX(-50%) translateY(12px);bottom:24px;z-index:80;
+  background:#fff;border:1.5px solid rgba(0,0,0,.10);box-shadow:0 8px 32px rgba(0,0,0,.14);
+  padding:10px 14px;border-radius:14px;font-size:12px;font-weight:600;
+  display:flex;gap:10px;align-items:center;
+  opacity:0;pointer-events:none;
+  transition:opacity var(--dur-med) var(--ease-standard),transform var(--dur-med) var(--ease-standard);}
+.toast::before{content:"";position:absolute;left:0;bottom:0;height:2px;width:100%;
+  background:var(--good);transform-origin:left;transform:scaleX(0);border-radius:0 0 14px 14px;}
+.toast.show{opacity:1;pointer-events:auto;transform:translateX(-50%) translateY(0);}
+.toast.show::before{animation:toastTimer 4.5s linear 1;}
+.toast button{all:unset;cursor:pointer;color:var(--good);font-weight:700;}
+@keyframes toastTimer{from{transform:scaleX(1)}to{transform:scaleX(0)}}
+
+/* ── REST DAY ── */
+.restView{padding:40px 20px;display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;}
+.restAnim{font-size:56px;line-height:1;animation:float 3s ease-in-out infinite;}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+.restTitle{font-size:18px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.3px;}
+.restSub{font-size:12px;color:var(--muted2);max-width:200px;}
+
+/* ── CONFETTI ── */
+.confetti-piece{position:fixed;width:9px;height:9px;border-radius:2px;top:-10px;opacity:1;
+  animation:confettiFall linear forwards;pointer-events:none;z-index:999;}
+@keyframes confettiFall{to{transform:translateY(110vh) rotate(720deg);opacity:0;}}
+
+/* ── MUSCLE TAG ── */
+.muscleTag{display:inline-block;width:3px;border-radius:999px;flex-shrink:0;align-self:stretch;margin:-12px 0 -12px -12px;margin-right:0;}
+
+/* ── MISC ── */
+.empty{padding:14px;border:1px dashed rgba(0,0,0,.10);border-radius:var(--r1);
+  background:rgba(0,0,0,.02);color:var(--muted);font-size:13px;line-height:1.4;}
+@media(max-width:380px){.thumb{width:62px;height:62px}.brand h1{font-size:24px}.actions{gap:4px}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="app">
+
+<header id="hdr">
+  <div class="brand">
+    <h1>My Fit Journey</h1>
+    <p class="sub">Strength Builder · 8 Weeks · Progress Saved ✓</p>
+  </div>
+  <div class="mascotStrip">
+    <div class="mascotWrap" id="mascotWrap"><!-- animated SVG injected by JS --></div>
+    <div class="mascotQuip" id="mascotQuip"></div>
+  </div>
+  <div class="actions">
+    <label class="pill">
+      <span class="dot" style="background:var(--good);"></span><span>Week</span>
+      <div class="selectWrap"><select id="weekSelect" aria-label="Week">
+        <option value="1">1</option><option value="2">2</option><option value="3">3</option>
+        <option value="4">4</option><option value="5">5</option><option value="6">6</option>
+        <option value="7">7</option><option value="8">8</option>
+      </select></div>
+    </label>
+    <label class="pill">
+      <span class="dot" style="background:var(--warn);"></span><span>Day</span>
+      <div class="selectWrap"><select id="daySelect" aria-label="Day">
+        <option value="1">1</option><option value="2">2</option><option value="3">3</option>
+        <option value="4">4</option><option value="5">5</option><option value="6">6</option>
+        <option value="7">7</option>
+      </select></div>
+    </label>
+    <button class="btn ghost" id="resetBtn">Reset Day</button>
+    <button class="btn primary" id="markAllBtn">Mark All ✓</button>
+  </div>
+</header>
+
+<div class="weekStrip" id="weekStrip"></div>
+<div class="milestoneBanner" id="milestoneBanner"><span class="mIcon" id="mIcon">🏆</span><span id="milestoneText"></span></div>
+
+<section class="panel">
+  <div class="panelHead">
+    <div><h2 id="panelTitle">Loading…</h2></div>
+    <div class="phaseBadge" id="phaseBadge"><span class="phaseDot" id="phaseDot"></span><span id="phaseLabel"></span></div>
+  </div>
+  <div class="content" id="content"></div>
+  <div class="progressWrap" id="progressWrap">
+    <div class="barWrap">
+      <div class="bar"><div id="barFill"></div></div>
+      <span class="barMascot" id="barMascot">🥱</span>
+    </div>
+    <div class="progressMeta">
+      <span><b id="progressPct">0%</b> complete</span>
+      <span><span id="progressDone">0</span> / <span id="progressTotal">0</span> sets</span>
+    </div>
+  </div>
+</section>
+
+</div>
+<div class="toast" id="toast"><span id="toastText">Updated</span><button id="undoBtn">Undo</button></div>
+
+<script>
+/* ── Safe stubs — real shared-config.js / shared-api.js override these if present ── */
+window.MFJ_DISABLE_POLISH = true;
+// shared-api.js should set window._MFJ_PLATFORM_LOADED = true when it loads
+if(typeof window.mfjCallApi !== "function"){
+  window.mfjCallApi = async () => ({ ok: false });
+}
+if(typeof window.mfjUpdateTrustStatus !== "function"){
+  window.mfjUpdateTrustStatus = () => {};
+}
+</script>
+<script>
+/* ─────────────────────────────────────────────
+   WORKOUT DATA
+───────────────────────────────────────────── */
+const SPLIT = {
+  "1": {
+    "1": { title:"Quads, Lower Abs & Calves", morning:[{name:"AM Cardio",sets:["20 min"]}], workout:[{name:"Hack Squat",sets:["15","15","15"]},{name:"Squat Press (Pause 2s)",sets:["15","15","15"]},{name:"Leg Extension (Drop 10/10/10)",sets:["10/10/10","10/10/10"]},{name:"Walking Lunges",sets:["10","10"]},{name:"Bodyweight Squats",sets:["10","10"]},{name:"Seated Calf Raise",sets:["30","30","30","30","30"]},{name:"Hanging Leg Raises",sets:["Failure","Failure","Failure"]},{name:"Lying Leg Raises",sets:["Failure","Failure","Failure"]}], finish:[{name:"PM Cardio",sets:["20 min"]}] },
+    "2": { title:"Chest & Shoulders", morning:[{name:"AM Cardio",sets:["20 min"]}], workout:[{name:"DB Chest Press (Triple Drop)",sets:["10/10/10","10/10/10","10/10/10"]},{name:"Incline Cable Fly",sets:["12","12","12"]},{name:"DB Floor Press",sets:["12","12","12"]},{name:"Decline DB Fly",sets:["12","12","12"]},{name:"Pushups",sets:["Failure","Failure","Failure"]},{name:"Smith Military Press",sets:["12","12","12"]},{name:"Cable Upright Row",sets:["12","12","12"]},{name:"Cable Side Raise",sets:["12","12","12"]},{name:"Cable Front Raise",sets:["12","12","12"]},{name:"Rear Delt Raise",sets:["10","10","10"]},{name:"Standing Rope Pulls",sets:["10","10","10"]}], finish:[{name:"PM Cardio",sets:["20 min"]}] },
+    "3": { title:"Arms", morning:[{name:"AM Cardio",sets:["20 min"]}], workout:[{name:"Reverse Grip Pushdown",sets:["12","12","12"]},{name:"Overhead Extension",sets:["12","12","12"]},{name:"Single Arm Rope Extension",sets:["10","10","10"]},{name:"Single Arm Kickbacks",sets:["10","10","10"]},{name:"Close Grip Pushups",sets:["Failure","Failure","Failure"]},{name:"Bench Dips",sets:["Failure","Failure","Failure"]},{name:"EZ Spider Curls",sets:["10","10","10"]},{name:"EZ Bar Curls",sets:["10","10","10"]},{name:"Reverse DB Curl",sets:["10","10","10"]},{name:"Hammer Curl",sets:["10","10","10"]},{name:"Lying Cable Curl",sets:["10","10","10"]},{name:"Alternating Cable Curl",sets:["10-12","10-12","10-12"]}], finish:[{name:"PM Cardio",sets:["20 min"]}] },
+    "4": { title:"Lower Back, Hamstrings & Upper Abs", morning:[{name:"AM Cardio",sets:["20 min"]}], workout:[{name:"Deadlifts",sets:["10","10","10"]},{name:"Seated Ham Curl",sets:["10","10","10"]},{name:"Glute Ham Raise",sets:["10","10","10"]},{name:"Stiff Leg Cable Deadlift",sets:["10","10","10"]},{name:"Decline Cross Situps",sets:["Failure","Failure","Failure","Failure"]},{name:"Conventional Situps",sets:["Failure","Failure","Failure","Failure"]}], finish:[{name:"PM Cardio",sets:["20 min"]}] },
+    "5": { title:"Upper Back & Calves", morning:[{name:"AM Cardio",sets:["20 min"]}], workout:[{name:"Lat Pulldown",sets:["10","10","10"]},{name:"Pullups",sets:["10","10","10"]},{name:"Rope Lat Pulldown",sets:["10","10","10"]},{name:"Single Arm DB Row",sets:["10","10","10"]},{name:"Single Arm Inverted Row",sets:["10","10","10"]},{name:"DB Pullovers",sets:["15","15","15"]},{name:"DB Shrugs",sets:["15","15","15"]},{name:"Standing Calf Press",sets:["20","20","20","20","20"]}], finish:[{name:"PM Cardio",sets:["20 min"]}] },
+    "6":{title:"Rest Day",morning:[],workout:[],finish:[]}, "7":{title:"Rest Day",morning:[],workout:[],finish:[]}
+  },
+  "2": {
+    "1": { title:"Legs, Lower Abs & Calves", morning:[{name:"AM Cardio",sets:["25 min"]}], workout:[{name:"Leg Extension (20,10,20)",sets:["20","10","20"]},{name:"Leg Press (30,20,10,20,30)",sets:["30","20","10","20","30"]},{name:"Alt Barbell Lunge + Squat Combo",sets:["10","10","10"]},{name:"Seated Calf Raise (30,20,10,20,30)",sets:["30","20","10","20","30"]},{name:"Lying Incline Leg Raises",sets:["15","15","15"]},{name:"Exercise Ball Knee Tuck",sets:["20","20","20"]},{name:"Plank Hold",sets:["30s","30s","30s"]}], finish:[{name:"PM Cardio",sets:["25 min"]}] },
+    "2": { title:"Chest & Shoulders", morning:[{name:"AM Cardio",sets:["25 min"]}], workout:[{name:"Hammer Press (20,15,10/10)",sets:["20","15","10/10"]},{name:"Incline Smith Press (20,10,10/10)",sets:["20","10","10/10"]},{name:"Seated Cable Fly (20,15,10/10)",sets:["20","15","10/10"]},{name:"Wide-Hand Pushups",sets:["Failure","Failure","Failure"]},{name:"Barbell Front Raise + Press Combo",sets:["10","10","10"]},{name:"Barbell Side Raises (10/10)",sets:["10/10","10/10","10/10"]},{name:"DB Rear Delt Fly",sets:["20","20","20"]}], finish:[{name:"PM Cardio",sets:["25 min"]}] },
+    "3": { title:"Arms", morning:[{name:"AM Cardio",sets:["25 min"]}], workout:[{name:"Overhead Triceps Extension",sets:["15","15","15"]},{name:"Seated Rope Extension (10/10/10)",sets:["10/10/10","10/10/10","10/10/10"]},{name:"Dips",sets:["10","10","10"]},{name:"EZ Spider Curl",sets:["10-12","10-12","10-12"]},{name:"Standing Banded Curl",sets:["10-12","10-12","10-12"]},{name:"Low Cable EZ Curl",sets:["10-12","10-12","10-12"]},{name:"Low Banded Curl",sets:["8-10","8-10","8-10"]},{name:"Incline DB Curl",sets:["10","10","10"]},{name:"Seated Banded Curl",sets:["10","10","10"]}], finish:[{name:"PM Cardio",sets:["25 min"]}] },
+    "4": { title:"Lower Back, Hamstrings & Upper Abs", morning:[{name:"AM Cardio",sets:["25 min"]}], workout:[{name:"Romanian Deadlift",sets:["15","12","10","10"]},{name:"Lying Leg Curl",sets:["15","12","10"]},{name:"Hyperextensions",sets:["15","12","10"]},{name:"Cable Crunch",sets:["20","20","20"]},{name:"Decline Situps",sets:["Failure","Failure","Failure"]}], finish:[{name:"PM Cardio",sets:["25 min"]}] },
+    "5": { title:"Upper Back & Calves", morning:[{name:"AM Cardio",sets:["25 min"]}], workout:[{name:"Lat Pulldown",sets:["15","12","10"]},{name:"Cable Row",sets:["15","12","10"]},{name:"DB Pullover",sets:["15","12","10"]},{name:"DB Shrugs",sets:["20","20","20"]},{name:"Single-Leg DB Calf Raise (30,25,20,20,20)",sets:["30","25","20","20","20"]}], finish:[{name:"PM Cardio",sets:["25 min"]}] },
+    "6":{title:"Rest Day",morning:[],workout:[],finish:[]}, "7":{title:"Rest Day",morning:[],workout:[],finish:[]}
+  },
+  "3": {
+    "1": { title:"Legs, Calves & Lower Abs", morning:[{name:"AM Cardio",sets:["30 min"]}], workout:[{name:"Leg Extension (25/25 + 5x10 Pyramid)",sets:["25/25","10","10","10","10","10"]},{name:"Landmine Squat",sets:["25","25","25"]},{name:"Hex Bar Squat",sets:["25","25","25"]},{name:"Bulgarian Split Squat",sets:["20","20","20"]},{name:"Smith Machine Front Squat",sets:["20","20","20"]},{name:"Seated Calf Raises",sets:["30","30","30","30","30"]},{name:"Captain's Chair Leg Raises",sets:["20","20","20"]},{name:"Medicine Ball Pass",sets:["Failure","Failure","Failure"]},{name:"Cross-Body Mountain Climbers",sets:["Failure","Failure","Failure"]}], finish:[{name:"PM Cardio",sets:["30 min"]}] },
+    "2": { title:"Chest & Shoulders", morning:[{name:"AM Cardio",sets:["30 min"]}], workout:[{name:"Incline DB Fly & Press Combo",sets:["20","20","20"]},{name:"Incline Close-Grip DB Press",sets:["10","10","10"]},{name:"Incline DB Press",sets:["10","10","10"]},{name:"Rollout Fly",sets:["10","10","10"]},{name:"Pushups",sets:["10","10","10"]},{name:"Smith Weighted Pushups",sets:["20","20","20"]},{name:"Smith Close-Grip Press (10/10)",sets:["10/10","10/10","10/10"]},{name:"Squat Press Shoulder Press (10/10)",sets:["10/10","10/10","10/10"]},{name:"Single-Arm Landmine Press",sets:["20","20","20"]},{name:"Single-Arm Bentover Rear Delt Raise",sets:["10-12","10-12","10-12"]},{name:"Leg Extension Single-Arm Rear Delt Raise",sets:["10-12","10-12","10-12"]}], finish:[{name:"PM Cardio",sets:["30 min"]}] },
+    "3": { title:"Arms", morning:[{name:"AM Cardio",sets:["30 min"]}], workout:[{name:"Kneeling Cable Overhead Triceps Extension (10/10)",sets:["10/10","10/10","10/10"]},{name:"Machine Triceps Extension (10/10)",sets:["10/10","10/10","10/10"]},{name:"Machine Triceps Pressdown (10/10)",sets:["10/10","10/10","10/10"]},{name:"Standing Cable Curls",sets:["10","10","10"]},{name:"Lying Cable Curls",sets:["10","10","10"]},{name:"Lying High Cable Curls",sets:["10","10","10"]},{name:"Standing High Cable Curls",sets:["10","10","10"]},{name:"Reverse-Grip EZ-Bar Curls",sets:["10","10","10"]},{name:"Close-Grip EZ-Bar Curls",sets:["10","10","10"]}], finish:[{name:"PM Cardio",sets:["30 min"]}] },
+    "4": { title:"Hamstrings, Lower Back & Upper Abs", morning:[{name:"AM Cardio",sets:["30 min"]}], workout:[{name:"Single-Leg Hamstring Curl",sets:["12","10","8","8","6"]},{name:"DB Stiff-Leg Deadlift",sets:["10","10","10","10","10"]},{name:"Weighted Hyperextensions (10/10)",sets:["10/10","10/10","10/10"]},{name:"Barbell Good Mornings (20,18,16)",sets:["20","18","16"]},{name:"Weighted Crunches",sets:["20","20","20"]},{name:"Cross-Body Crunches",sets:["20","20","20"]},{name:"Exercise Ball Rollouts",sets:["20","20","20"]},{name:"Ab Twists",sets:["50","50","50"]}], finish:[{name:"PM Cardio",sets:["30 min"]}] },
+    "5": { title:"Upper Back & Calves", morning:[{name:"AM Cardio",sets:["30 min"]}], workout:[{name:"DB Seal Row (10/10)",sets:["10/10","10/10","10/10"]},{name:"Incline Straight-Arm Pullover",sets:["12","12","12"]},{name:"Barbell Bentover Row",sets:["10","10","10"]},{name:"Seated EZ-Bar Shrugs",sets:["20","20","20"]},{name:"Calf Press",sets:["20","20","20","20","20"]}], finish:[{name:"PM Cardio",sets:["30 min"]}] },
+    "6":{title:"Rest Day",morning:[],workout:[],finish:[]}, "7":{title:"Rest Day",morning:[],workout:[],finish:[]}
+  },
+  "4": {
+    "1": { title:"Legs, Calves & Lower Abs", morning:[{name:"AM Cardio",sets:["35 min"]}], workout:[{name:"Leg Press (Giant Set Style)",sets:["25","20","15","15","10"]},{name:"Smith Squats",sets:["20","20","20"]},{name:"Walking Lunges",sets:["20","20","20"]},{name:"Seated Calf Raise",sets:["30","30","30","30","30"]},{name:"Hanging Leg Raises",sets:["Failure","Failure","Failure"]},{name:"Decline Situps",sets:["Failure","Failure","Failure"]}], finish:[{name:"PM Cardio",sets:["35 min"]}] },
+    "2": { title:"Chest & Shoulders", morning:[{name:"AM Cardio",sets:["35 min"]}], workout:[{name:"Incline DB Press",sets:["15","12","10","10"]},{name:"Flat DB Fly",sets:["15","12","10"]},{name:"Weighted Pushups",sets:["Failure","Failure","Failure"]},{name:"Barbell Shoulder Press",sets:["15","12","10","10"]},{name:"Side Raises (Superset)",sets:["15","15","15"]},{name:"Rear Delt Fly",sets:["15","15","15"]}], finish:[{name:"PM Cardio",sets:["35 min"]}] },
+    "3": { title:"Arms (Superset Focus)", morning:[{name:"AM Cardio",sets:["35 min"]}], workout:[{name:"Close Grip Bench Press",sets:["12","10","10"]},{name:"EZ Bar Curl",sets:["12","10","10"]},{name:"Overhead Extension",sets:["12","12","12"]},{name:"Hammer Curl",sets:["12","12","12"]},{name:"Cable Pushdown",sets:["15","15","15"]},{name:"Cable Curl",sets:["15","15","15"]}], finish:[{name:"PM Cardio",sets:["35 min"]}] },
+    "4": { title:"Lower Back, Hamstrings & Upper Abs", morning:[{name:"AM Cardio",sets:["35 min"]}], workout:[{name:"Romanian Deadlift",sets:["15","12","10","10"]},{name:"Seated Ham Curl",sets:["15","12","10"]},{name:"Hyperextensions",sets:["15","15","15"]},{name:"Cable Crunch",sets:["20","20","20"]},{name:"Ab Rollouts",sets:["15","15","15"]}], finish:[{name:"PM Cardio",sets:["35 min"]}] },
+    "5": { title:"Upper Back & Calves", morning:[{name:"AM Cardio",sets:["35 min"]}], workout:[{name:"Pull-ups",sets:["Failure","Failure","Failure"]},{name:"Barbell Row",sets:["12","10","10"]},{name:"Lat Pulldown",sets:["12","12","12"]},{name:"Barbell Shrugs",sets:["20","20","20"]},{name:"Standing Calf Press",sets:["25","25","25","25","25"]}], finish:[{name:"PM Cardio",sets:["35 min"]}] },
+    "6":{title:"Rest Day",morning:[],workout:[],finish:[]}, "7":{title:"Rest Day",morning:[],workout:[],finish:[]}
+  },
+  "5": {
+    "1": { title:"Quads, Calves & Lower Abs (DTPXtreme)", morning:[{name:"AM Cardio",sets:["40 min"]}], workout:[{name:"Leg Extensions DTPXtreme",sets:["30","20","10","10","20","30"]},{name:"Hack Squats (Narrow Stance)",sets:["30","25","20"]},{name:"Reverse Hack Squats (Narrow Stance)",sets:["20","25","30"]},{name:"Leg Press DTPXtreme",sets:["30","20","10","10","20","30"]},{name:"Seated Calf Raises DTPXtreme",sets:["30","20","10","10","20","30"]},{name:"Hanging Windshield Wipers",sets:["Failure","Failure","Failure","Failure","Failure"]},{name:"Lying Windshield Wipers",sets:["Failure","Failure","Failure","Failure","Failure"]}], finish:[{name:"PM Cardio",sets:["40 min"]}] },
+    "2": { title:"Chest & Shoulders (DTPXtreme)", morning:[{name:"AM Cardio",sets:["40 min"]}], workout:[{name:"Incline Dumbbell Press",sets:["30","20","10","10","20","30"]},{name:"Decline Dumbbell Press",sets:["30","20","10","10","20","30"]},{name:"Flat Chest Press Machine",sets:["30","20","10","10","20","30"]},{name:"Front Plate Raises",sets:["30","20","10","10","20","30"]},{name:"Bent-Over Reverse Plate Flyes",sets:["30","20","10","10","20","30"]},{name:"Side Lateral Plate Raises",sets:["30","20","10","10","20","30"]}], finish:[{name:"PM Cardio",sets:["40 min"]}] },
+    "3": { title:"Arms (DTPXtreme Supersets)", morning:[{name:"AM Cardio",sets:["40 min"]}], workout:[{name:"Triceps Extensions",sets:["30","25","20","20","25","30"]},{name:"Dumbbell Biceps Curl",sets:["20","15","10","10","15","20"]},{name:"EZ Bar Skull Crushers",sets:["30","25","20","20","25","30"]},{name:"Cable EZ Bar Preacher Curls",sets:["20","15","10","10","15","20"]},{name:"Dips",sets:["30","25","20","20","25","30"]},{name:"Hammer Curls",sets:["20","15","10","10","15","20"]}], finish:[{name:"PM Cardio",sets:["40 min"]}] },
+    "4": { title:"Lower Back, Hamstrings & Upper Abs (DTPXtreme)", morning:[{name:"AM Cardio",sets:["40 min"]}], workout:[{name:"Deadlifts",sets:["15","10","5","5","10","15"]},{name:"Lying Leg Curls",sets:["30","20","10","10","20","30"]},{name:"Seated Leg Curls",sets:["30","20","10","10","20","30"]},{name:"Standing Cable Crunches",sets:["30","30","30","30","30"]},{name:"Exercise Ball Alternating Crunches",sets:["30","30","30","30","30"]}], finish:[{name:"PM Cardio",sets:["40 min"]}] },
+    "5": { title:"Upper Back & Calves (DTPXtreme)", morning:[{name:"AM Cardio",sets:["40 min"]}], workout:[{name:"Pull-ups",sets:["20","15","10","10","15","20"]},{name:"T-Bar Rows",sets:["20","15","10","10","15","20"]},{name:"Seated Machine Row",sets:["20","15","10","10","15","20"]},{name:"Machine Shrugs",sets:["30","20","10","10","20","30"]},{name:"Calf Raise Machine",sets:["30","20","10","10","20","30"]}], finish:[{name:"PM Cardio",sets:["40 min"]}] },
+    "6":{title:"Rest Day",morning:[],workout:[],finish:[]}, "7":{title:"Rest Day",morning:[],workout:[],finish:[]}
+  },
+  "6": {
+    "1": { title:"Quads & Calves", morning:[{name:"AM Cardio",sets:["45 min"]}], workout:[{name:"Leg Extensions",sets:["20","15","10"]},{name:"Squats",sets:["20","25","30"]},{name:"Leg Press",sets:["20","15","10"]},{name:"Hack Squats",sets:["20","15","10"]},{name:"Seated Calf Raises",sets:["30","25","20","10","15","20"]}], finish:[{name:"PM Cardio",sets:["45 min"]}] },
+    "2": { title:"Chest & Shoulders", morning:[{name:"AM Cardio",sets:["45 min"]}], workout:[{name:"Flat Dumbbell Press",sets:["30","20","10"]},{name:"Incline Dumbbell Flyes",sets:["10","15","20"]},{name:"Decline Smith Machine Press",sets:["30","20","10"]},{name:"Cable Crossover",sets:["10","15","20","30"]},{name:"Incline Front Barbell Raises",sets:["30","20","10"]},{name:"Incline Front Dumbbell Raises",sets:["10","15","20"]},{name:"Incline Rear Delt Flyes",sets:["30","20","10"]},{name:"Incline Bench Rear Dumbbell Flyes",sets:["10","15","20"]},{name:"Dumbbell Lateral Raise",sets:["30","20","10"]},{name:"Seated Side Lateral Dumbbell Raises",sets:["10","15","20"]}], finish:[{name:"PM Cardio",sets:["45 min"]}] },
+    "3": { title:"Arms", morning:[{name:"AM Cardio",sets:["45 min"]}], workout:[{name:"Machine Preacher Curls",sets:["30","20","10"]},{name:"Rope Pressdown",sets:["10","15","20"]},{name:"Reverse-Grip Triceps Extensions",sets:["30","20","10"]},{name:"Reverse-Grip Cable Biceps Curl",sets:["20","25","30"]},{name:"Smith Machine Drag Curl",sets:["30","20","10"]},{name:"Smith Machine Close-Grip Bench Press",sets:["20","25","30"]},{name:"Incline Overhead Dumbbell Extensions",sets:["30","20","10"]},{name:"Spider Curls",sets:["20","25","30"]}], finish:[{name:"PM Cardio",sets:["45 min"]}] },
+    "4": { title:"Lower Back, Hamstrings & Upper Abs", morning:[{name:"AM Cardio",sets:["45 min"]}], workout:[{name:"Glute-Ham Raise",sets:["30","20","10"]},{name:"Seated Leg Curls",sets:["20","25","30"]},{name:"Lying Cable Hamstring Curl",sets:["30","20","10"]},{name:"Reverse Hack Squat",sets:["20","25","30"]},{name:"Hyperextensions",sets:["30","20","10"]},{name:"Dumbbell Deadlifts",sets:["20","25","30"]},{name:"Exercise Ball Cable Crunches",sets:["Failure"]},{name:"Ab Wheel Rollouts",sets:["Failure"]}], finish:[{name:"PM Cardio",sets:["45 min"]}] },
+    "5": { title:"Upper Back & Calves", morning:[{name:"AM Cardio",sets:["45 min"]}], workout:[{name:"Machine Pullover",sets:["30","20","10"]},{name:"Straight-Arm Dumbbell Pullover",sets:["20","25","30"]},{name:"Straight-Arm Pulldown",sets:["30","20","10"]},{name:"Lat Pulldown",sets:["20","25","30"]},{name:"Machine Shrugs",sets:["30","20","10","20","25","30"]},{name:"Standing Calf Raise",sets:["30","20","10"]},{name:"Donkey Calf Raises",sets:["20","25","30"]}], finish:[{name:"PM Cardio",sets:["45 min"]}] },
+    "6":{title:"Rest Day",morning:[],workout:[],finish:[]}, "7":{title:"Rest Day",morning:[],workout:[],finish:[]}
+  },
+  "7": {
+    "1": { title:"Quads, Calves & Lower Abs (Superset Phase)", morning:[{name:"AM Cardio",sets:["50 min"]}], workout:[{name:"Leg Extensions",sets:["20","15","10"]},{name:"Seated Leg Press",sets:["20","15","10"]},{name:"Hack Squat",sets:["20","15","10"]},{name:"Barbell Squat",sets:["20","15","10"]},{name:"Seated Calf Raises",sets:["20","25","30"]},{name:"Flat Bench Lying Leg Raise",sets:["Failure","Failure","Failure"]}], finish:[{name:"PM Cardio",sets:["50 min"]}] },
+    "2": { title:"Chest & Shoulders (Superset Phase)", morning:[{name:"AM Cardio",sets:["50 min"]}], workout:[{name:"Incline Dumbbell Press",sets:["20","15","10"]},{name:"Flat Dumbbell Press",sets:["20","15","10"]},{name:"Cable Crossover",sets:["20","15","10"]},{name:"Smith Machine Press",sets:["20","15","10"]},{name:"Front Raises",sets:["20","15","10"]},{name:"Side Lateral Raises",sets:["20","15","10"]}], finish:[{name:"PM Cardio",sets:["50 min"]}] },
+    "3": { title:"Arms (Superset Focus)", morning:[{name:"AM Cardio",sets:["50 min"]}], workout:[{name:"EZ Bar Curl",sets:["20","15","10"]},{name:"Rope Pushdown",sets:["20","15","10"]},{name:"Preacher Curl",sets:["20","15","10"]},{name:"Overhead Extension",sets:["20","15","10"]},{name:"Hammer Curl",sets:["20","15","10"]},{name:"Dips",sets:["Failure","Failure","Failure"]}], finish:[{name:"PM Cardio",sets:["50 min"]}] },
+    "4": { title:"Lower Back, Hamstrings & Upper Abs", morning:[{name:"AM Cardio",sets:["50 min"]}], workout:[{name:"Romanian Deadlift",sets:["20","15","10"]},{name:"Lying Leg Curl",sets:["20","15","10"]},{name:"Seated Leg Curl",sets:["20","15","10"]},{name:"Cable Crunch",sets:["25","25","25"]},{name:"Ab Rollouts",sets:["Failure","Failure","Failure"]}], finish:[{name:"PM Cardio",sets:["50 min"]}] },
+    "5": { title:"Upper Back & Calves", morning:[{name:"AM Cardio",sets:["50 min"]}], workout:[{name:"Pull-ups",sets:["20","15","10"]},{name:"Barbell Rows",sets:["20","15","10"]},{name:"Lat Pulldown",sets:["20","15","10"]},{name:"Machine Shrugs",sets:["20","25","30"]},{name:"Standing Calf Raise",sets:["20","25","30"]}], finish:[{name:"PM Cardio",sets:["50 min"]}] },
+    "6":{title:"Rest Day",morning:[],workout:[],finish:[]}, "7":{title:"Rest Day",morning:[],workout:[],finish:[]}
+  },
+  "8": {
+    "1": { title:"Quads, Calves & Lower Abs (Final Phase)", morning:[{name:"AM Cardio",sets:["55 min"]}], workout:[{name:"Leg Extensions",sets:["30","20","10","10","20","30"]},{name:"Sissy Squats",sets:["Failure","Failure","Failure"]},{name:"Leg Press",sets:["30","20","10","10","20","30"]},{name:"Seated Calf Raise",sets:["30","20","10","10","20","30"]},{name:"Hanging Leg Raises",sets:["Failure","Failure","Failure"]}], finish:[{name:"PM Cardio",sets:["55 min"]}] },
+    "2": { title:"Chest & Shoulders (Final Phase)", morning:[{name:"AM Cardio",sets:["55 min"]}], workout:[{name:"Incline Dumbbell Press",sets:["30","20","10","10","20","30"]},{name:"Flat Dumbbell Fly",sets:["30","20","10","10","20","30"]},{name:"Cable Crossover",sets:["30","20","10","10","20","30"]},{name:"Barbell Shoulder Press",sets:["30","20","10","10","20","30"]},{name:"Side Lateral Raise",sets:["30","20","10","10","20","30"]}], finish:[{name:"PM Cardio",sets:["55 min"]}] },
+    "3": { title:"Arms (Final Phase)", morning:[{name:"AM Cardio",sets:["55 min"]}], workout:[{name:"EZ Bar Curl",sets:["30","20","10","10","20","30"]},{name:"Cable Pushdown",sets:["30","20","10","10","20","30"]},{name:"Preacher Curl",sets:["30","20","10","10","20","30"]},{name:"Overhead Triceps Extension",sets:["30","20","10","10","20","30"]}], finish:[{name:"PM Cardio",sets:["55 min"]}] },
+    "4": { title:"Lower Back, Hamstrings & Upper Abs (Final Phase)", morning:[{name:"AM Cardio",sets:["55 min"]}], workout:[{name:"Romanian Deadlift",sets:["30","20","10","10","20","30"]},{name:"Lying Leg Curl",sets:["30","20","10","10","20","30"]},{name:"Hyperextensions",sets:["30","20","10"]},{name:"Cable Crunch",sets:["Failure","Failure","Failure"]}], finish:[{name:"PM Cardio",sets:["55 min"]}] },
+    "5": { title:"Upper Back & Calves (Final Phase)", morning:[{name:"AM Cardio",sets:["55 min"]}], workout:[{name:"Pull-ups",sets:["Failure","Failure","Failure"]},{name:"Barbell Rows",sets:["30","20","10","10","20","30"]},{name:"Lat Pulldown",sets:["30","20","10","10","20","30"]},{name:"Standing Calf Raise",sets:["30","20","10","10","20","30"]}], finish:[{name:"PM Cardio",sets:["55 min"]}] },
+    "6":{title:"Rest Day",morning:[],workout:[],finish:[]}, "7":{title:"Rest Day",morning:[],workout:[],finish:[]}
+  }
+};
+
+/* ─── MUSCLE GROUP COLOR + EMOJI ─── */
+function muscleInfo(name){
+  const n=name.toLowerCase();
+  if(n.includes("cardio")) return {color:"var(--c-cardio)",emoji:"🏃"};
+  if(n.includes("calf")||n.includes("leg")||n.includes("squat")||n.includes("lunge")||n.includes("hack")||n.includes("deadlift")||n.includes("ham")||n.includes("glute")||n.includes("hyper")||n.includes("good morning")) return {color:"var(--c-legs)",emoji:"🦵"};
+  if(n.includes("chest")||n.includes("bench")||n.includes("fly")||n.includes("pushup")||n.includes("push-up")||n.includes("dip")) return {color:"var(--c-chest)",emoji:"💪"};
+  if(n.includes("pull")||n.includes("row")||n.includes("shrug")) return {color:"var(--c-back)",emoji:"🔙"};
+  if(n.includes("curl")||n.includes("tricep")||n.includes("pressdown")||n.includes("extension")||n.includes("kickback")||n.includes("skull")||n.includes("spider")) return {color:"var(--c-arms)",emoji:"💪"};
+  if(n.includes("shoulder")||n.includes("military")||n.includes("press")&&!n.includes("bench")||n.includes("raise")||n.includes("delt")||n.includes("upright")||n.includes("plate")) return {color:"var(--c-shoulders)",emoji:"🏋️"};
+  if(n.includes("sit")||n.includes("crunch")||n.includes("ab ")||n.includes("abs")||n.includes("plank")||n.includes("mountain")||n.includes("rollout")||n.includes("wiper")||n.includes("tuck")) return {color:"var(--c-abs)",emoji:"🏅"};
+  return {color:"var(--c-cardio)",emoji:"⚡"};
+}
+
+/* ─── ANIMATED MASCOT SVG (CSS-animated stick figure) ─── */
+function mascotSVG(state){
+  // state: 'idle' | 'lift' | 'flex' | 'tired' | 'celebrate'
+  const base='stroke="#222" stroke-width="6" stroke-linecap="round" fill="none"';
+  // head always same
+  const head='<circle cx="18" cy="6" r="5" fill="#222" stroke="none"/>';
+  if(state==='celebrate'){
+    return `<svg viewBox="0 0 36 48" xmlns="http://www.w3.org/2000/svg">
+      ${head}
+      <line ${base} x1="18" y1="11" x2="18" y2="28"/>
+      <line ${base} x1="18" y1="14" x2="4" y2="6"/>
+      <line ${base} x1="18" y1="14" x2="32" y2="6"/>
+      <line ${base} x1="18" y1="28" x2="10" y2="42"/>
+      <line ${base} x1="18" y1="28" x2="26" y2="42"/>
+      <animateTransform attributeName="transform" type="rotate" from="0 18 24" to="10 18 24" dur=".3s" values="0 18 24;10 18 24;-10 18 24;0 18 24" repeatCount="indefinite"/>
+    </svg>`;
+  }
+  if(state==='flex'){
+    return `<svg viewBox="0 0 36 48" xmlns="http://www.w3.org/2000/svg">
+      ${head}
+      <line ${base} x1="18" y1="11" x2="18" y2="28"/>
+      <path ${base} d="M18,14 L6,10 Q2,14 6,18"/>
+      <path ${base} d="M18,14 L30,10 Q34,14 30,18"/>
+      <line ${base} x1="18" y1="28" x2="10" y2="42"/>
+      <line ${base} x1="18" y1="28" x2="26" y2="42"/>
+    </svg>`;
+  }
+  if(state==='lift'){
+    return `<svg viewBox="0 0 36 48" xmlns="http://www.w3.org/2000/svg">
+      ${head}
+      <line ${base} x1="18" y1="11" x2="18" y2="30"/>
+      <line ${base} x1="8" y1="18" x2="28" y2="18"/>
+      <line ${base} x1="4" y1="12" x2="8" y2="18"/>
+      <line ${base} x1="32" y1="12" x2="28" y2="18"/>
+      <line ${base} x1="2" y1="12" x2="6" y2="12"/>
+      <line ${base} x1="30" y1="12" x2="34" y2="12"/>
+      <line ${base} x1="18" y1="30" x2="10" y2="44"/>
+      <line ${base} x1="18" y1="30" x2="26" y2="44"/>
+    </svg>`;
+  }
+  if(state==='tired'){
+    return `<svg viewBox="0 0 36 48" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="18" cy="7" r="5" fill="#222" stroke="none"/>
+      <line ${base} x1="18" y1="12" x2="18" y2="30" style="stroke:#aaa"/>
+      <line ${base} x1="18" y1="16" x2="8" y2="22" style="stroke:#aaa"/>
+      <line ${base} x1="18" y1="16" x2="28" y2="22" style="stroke:#aaa"/>
+      <line ${base} x1="18" y1="30" x2="12" y2="44" style="stroke:#aaa"/>
+      <line ${base} x1="18" y1="30" x2="24" y2="44" style="stroke:#aaa"/>
+      <path d="M14 5 Q16 3 18 5" stroke="#222" stroke-width="2" fill="none"/>
+    </svg>`;
+  }
+  // idle
+  return `<svg viewBox="0 0 36 48" xmlns="http://www.w3.org/2000/svg">
+    ${head}
+    <line ${base} x1="18" y1="11" x2="18" y2="30"/>
+    <line ${base} x1="18" y1="16" x2="8" y2="24"/>
+    <line ${base} x1="18" y1="16" x2="28" y2="24"/>
+    <line ${base} x1="18" y1="30" x2="10" y2="44"/>
+    <line ${base} x1="18" y1="30" x2="26" y2="44"/>
+  </svg>`;
+}
+
+/* ─── MASCOT QUIPS ─── */
+const QUIPS = {
+  start: ["You showed up. That's 90% of it 💪","Let's get this bread (and then burn it off) 🔥","Your future self is already impressed 🤙","Warning: gains incoming ⚡","Pain is weakness leaving the body... slowly 😅"],
+  mid: ["Keep going, you absolute unit 🦁","Not stopping now — you're on fire 🔥","Halfway there, no refunds 😂","The weights aren't gonna lift themselves (...yet) 🤖","Your muscles called. They say thanks 💬"],
+  almost: ["One more push! You're almost there 🚀","This is where champions are made 🏆","Feel that? That's progress, baby 🎯","So close. Do NOT stop now 👊","Final push time 💥"],
+  done: ["BEAST MODE UNLOCKED 🏆","You just did that. Legendary 🌟","Rest. Eat. Repeat. You earned it 🍗","Your mirror is going to be SO happy 😎","That was unreal. Tell a friend 📣"],
+  rest: ["Rest days are gains days 💤","Recovery is part of the grind 🧘","Eating is training too. Fuel up 🍳","Netflix and grow 😂","Tomorrow we lift. Today we vibe 🛋️"]
+};
+function randomQuip(pool){ return pool[Math.floor(Math.random()*pool.length)]; }
+
+/* ─── PHASE INFO ─── */
+function getPhase(w){
+  const n=Number(w);
+  if(n<=2) return {label:"Foundation",color:"#94a3b8"};
+  if(n<=4) return {label:"Build Phase",color:"#60a5fa"};
+  if(n===5) return {label:"DTPXtreme",color:"#f472b6"};
+  if(n<=7) return {label:"Intensity",color:"#fb923c"};
+  return {label:"Final Phase",color:"#a78bfa"};
+}
+
+/* ─── STORAGE (identical keys) ─── */
+const STORAGE_KEY="JFC_STRENGTH_WEEK1_V2";
+const BACKUP_KEY ="JFC_STRENGTH_WEEK1_BACKUP_V2";
+function loadState(){
+  try{let d=localStorage.getItem(STORAGE_KEY)||localStorage.getItem(BACKUP_KEY);
+    if(!d)return{week:1,day:1,checks:{}};return JSON.parse(d);}
+  catch(_){return{week:1,day:1,checks:{}};}
+}
+let state=loadState();
+let syncTimer=null,syncInFlight=false;
+function persistLocalState(){
+  try{const j=JSON.stringify(state);localStorage.setItem(STORAGE_KEY,j);localStorage.setItem(BACKUP_KEY,j);}catch(_){}
+}
+async function saveStateToCloud(){
+  if(syncInFlight)return;
+  const memberEmail=(sessionStorage.getItem("mfj_last_email")||localStorage.getItem("mfj_last_email")||"").trim().toLowerCase();
+  if(!memberEmail||typeof window.mfjCallApi!=="function")return;
+  syncInFlight=true;
+  try{await window.mfjCallApi("save_progress",{email:memberEmail,progressJson:JSON.stringify(state)},8000);}catch(_){}finally{syncInFlight=false;}
+}
+function saveState(){
+  persistLocalState();
+  if(syncTimer)clearTimeout(syncTimer);
+  syncTimer=setTimeout(saveStateToCloud,500);
+}
+function updateTrustStatus(s){if(typeof window.mfjUpdateTrustStatus==="function")window.mfjUpdateTrustStatus(s);}
+async function initCloudState(){
+  const memberEmail=(sessionStorage.getItem("mfj_last_email")||localStorage.getItem("mfj_last_email")||"").trim().toLowerCase();
+  if(!memberEmail||typeof window.mfjCallApi!=="function")return;
+  try{
+    const res=await window.mfjCallApi("load_progress",{email:memberEmail},8000);
+    if(res&&res.ok&&res.progressJson){state=JSON.parse(res.progressJson);persistLocalState();}
+    else{await saveStateToCloud();}
+  }catch(_){}
+}
+
+/* ─── ELEMENTS ─── */
+const content=document.getElementById("content");
+const panelTitle=document.getElementById("panelTitle");
+const barFill=document.getElementById("barFill");
+const progressPct=document.getElementById("progressPct");
+const progressDone=document.getElementById("progressDone");
+const progressTotal=document.getElementById("progressTotal");
+const toast=document.getElementById("toast");
+const toastText=document.getElementById("toastText");
+const undoBtn=document.getElementById("undoBtn");
+const progressWrap=document.getElementById("progressWrap");
+const barMascot=document.getElementById("barMascot");
+const weekSelect=document.getElementById("weekSelect");
+const daySelect=document.getElementById("daySelect");
+const weekStrip=document.getElementById("weekStrip");
+const phaseDot=document.getElementById("phaseDot");
+const phaseLabel=document.getElementById("phaseLabel");
+const milestoneBanner=document.getElementById("milestoneBanner");
+const milestoneText=document.getElementById("milestoneText");
+const mIcon=document.getElementById("mIcon");
+const mascotWrap=document.getElementById("mascotWrap");
+const mascotQuip=document.getElementById("mascotQuip");
+let undoSnapshot=null,toastTimer=null,milestoneTimer=null,lastPct=0;
+
+/* ─── KEY / UID HELPERS (identical) ─── */
+function keyFor(week,day,uid,idx){return `w${week}|d${day}|${uid}|${idx}`;}
+function withUids(plan){
+  return{...plan,
+    morning:(plan.morning||[]).map((item,idx)=>({...item,uid:`m-${idx}-${item.name}`})),
+    workout:(plan.workout||[]).map((item,idx)=>({...item,uid:`w-${idx}-${item.name}`})),
+    finish:(plan.finish||[]).map((item,idx)=>({...item,uid:`f-${idx}-${item.name}`}))
+  };
+}
+function allKeysForDay(week,day,plan){
+  const keys=[];
+  [...plan.morning,...plan.workout,...plan.finish].forEach(item=>(item.sets||[]).forEach((_,i)=>keys.push(keyFor(week,day,item.uid,i))));
+  return keys;
+}
+function safe(s){return String(s).replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+
+/* ─── WEEK STRIP ─── */
+const DAY_NAMES=["Su","Mo","Tu","We","Th","Fr","Sa"];
+function renderWeekStrip(){
+  const w=state.week;
+  weekStrip.innerHTML="";
+  for(let d=1;d<=7;d++){
+    const raw=(SPLIT[String(w)]||{})[String(d)];
+    const isRest=!raw||(!raw.workout.length&&!raw.morning.length&&!raw.finish.length);
+    const isActive=d===state.day;
+    let pipHTML="";
+    if(isRest){
+      pipHTML=`<span class="dPip empty"></span>`;
+    } else {
+      const plan=withUids(raw);
+      const keys=allKeysForDay(w,d,plan);
+      const done=keys.filter(k=>state.checks[k]).length;
+      const total=keys.length;
+      const filled=total>0?Math.round((done/total)*Math.min(total,5)):0;
+      for(let p=0;p<Math.min(total,5);p++) pipHTML+=`<span class="dPip${p<filled?" done":""}"></span>`;
+    }
+    const dot=document.createElement("div");
+    dot.className=`dayDot${isRest?" restDay":""}${isActive?" active":""}`;
+    dot.innerHTML=`<span class="dLabel">${DAY_NAMES[d%7]||d}</span><span class="dNum">${d}</span><div class="dPips">${pipHTML}</div>`;
+    if(!isRest){
+      dot.addEventListener("click",()=>{state.day=d;daySelect.value=d;saveState();renderPlan();window.scrollTo({top:0,behavior:"smooth"});});
+    }
+    weekStrip.appendChild(dot);
+  }
+}
+
+/* ─── CONFETTI ─── */
+const CONFETTI_COLORS=["#2EA8FF","#f472b6","#a78bfa","#34d399","#fb923c","#facc15","#60a5fa"];
+function launchConfetti(){
+  for(let i=0;i<60;i++){
+    const el=document.createElement("div");
+    el.className="confetti-piece";
+    el.style.cssText=`left:${Math.random()*100}vw;background:${CONFETTI_COLORS[i%CONFETTI_COLORS.length]};animation-duration:${0.9+Math.random()*1.4}s;animation-delay:${Math.random()*0.5}s;transform:rotate(${Math.random()*360}deg);`;
+    document.body.appendChild(el);
+    el.addEventListener("animationend",()=>el.remove(),{once:true});
+  }
+}
+
+/* ─── TOAST ─── */
+function showToast(msg,onUndo){
+  toastText.textContent=msg;toast.classList.add("show");undoSnapshot=onUndo;
+  if(toastTimer)clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>toast.classList.remove("show"),4500);
+}
+
+/* ─── MILESTONE ─── */
+const MILESTONES={
+  25:{icon:"🌡️",text:"25% done — just getting warmed up!"},
+  50:{icon:"🔥",text:"Halfway there — you absolute beast!"},
+  75:{icon:"⚡",text:"75% done — don't you dare stop now!"},
+  100:{icon:"🏆",text:"WORKOUT COMPLETE. You're a legend!"}
+};
+function showMilestone(pct){
+  const m=MILESTONES[pct];if(!m)return;
+  mIcon.textContent=m.icon;milestoneText.textContent=m.text;
+  milestoneBanner.classList.add("show");
+  if(milestoneTimer)clearTimeout(milestoneTimer);
+  milestoneTimer=setTimeout(()=>milestoneBanner.classList.remove("show"),3500);
+  if(pct===100) launchConfetti();
+}
+
+/* ─── PROGRESS ─── */
+function renderProgress(plan){
+  const keys=allKeysForDay(state.week,state.day,plan);
+  const done=keys.filter(k=>!!state.checks[k]).length;
+  const total=keys.length;
+  const pct=Math.round((done/(total||1))*100);
+  barFill.style.width=pct+"%";
+  progressPct.textContent=pct+"%";
+  progressDone.textContent=done;
+  progressTotal.textContent=total;
+  // mascot emoji
+  if(pct===0) barMascot.textContent="🥱";
+  else if(pct<25) barMascot.textContent="😤";
+  else if(pct<50) barMascot.textContent="💪";
+  else if(pct<75) barMascot.textContent="🔥";
+  else if(pct<100) barMascot.textContent="⚡";
+  else barMascot.textContent="🏆";
+  if(pct>lastPct){
+    barFill.classList.remove("shine");void barFill.offsetWidth;barFill.classList.add("shine");
+    barMascot.classList.remove("flex");void barMascot.offsetWidth;barMascot.classList.add("flex");
+    if([25,50,75,100].includes(pct)) showMilestone(pct);
+  }
+  progressWrap.classList.toggle("milestone",[25,50,75,100].includes(pct));
+  lastPct=pct;
+  // update header mascot quip based on progress
+  if(pct===0) mascotQuip.textContent=randomQuip(QUIPS.start);
+  else if(pct<50) mascotQuip.textContent=randomQuip(QUIPS.mid);
+  else if(pct<100) mascotQuip.textContent=randomQuip(QUIPS.almost);
+  else mascotQuip.textContent=randomQuip(QUIPS.done);
+}
+
+/* ─── CARD + CHIP HTML ─── */
+function chipHTML(week,day,uid,i,label){
+  const k=keyFor(week,day,uid,i);
+  const checked=!!state.checks[k];
+  return `<div class="chip${checked?" checked":""}" data-key="${k}"><span class="dot"></span>${safe(label)}</div>`;
+}
+function card(week,day,item,stateClass){
+  const mi=muscleInfo(item.name);
+  const allDone=(item.sets||[]).every((_,i)=>!!state.checks[keyFor(week,day,item.uid,i)]);
+  const chips=(item.sets||[]).map((s,i)=>chipHTML(week,day,item.uid,i,`Set ${i+1}: ${s}`)).join("");
+  const cls=stateClass+(allDone?" done":"");
+  return `<div class="card ${cls}" style="border-left:3px solid ${mi.color};">
+    <div class="cardInner">
+      <div class="thumb" style="background:${mi.color}18;">
+        <div style="font-size:32px;line-height:1;">${mi.emoji}</div>
+        <div class="shine"></div>
+      </div>
+      <div class="info">
+        <p class="name">${safe(item.name)}</p>
+        <p class="detail">${safe((item.sets||[]).join(" · "))}</p>
+        <div class="sets">${chips}</div>
+      </div>
+    </div>
+  </div>`;
+}
+function section(week,day,title,items,hint,activeName,nextName){
+  return `<div class="sectionTitle">${title} <small style="color:var(--muted2);font-size:10px;text-transform:none;font-weight:400;">${hint||""}</small></div>`
+    +items.map(it=>{
+      const cls=it.uid===activeName?"active":it.uid===nextName?"next":((it.sets||[]).every((_,i)=>!!state.checks[keyFor(week,day,it.uid,i)])?"done":"");
+      return card(week,day,it,cls);
+    }).join("");
+}
+
+/* ─── MAIN RENDER ─── */
+function renderPlan(){
+  weekSelect.disabled=false;daySelect.disabled=false;
+  const week=String(state.week),day=String(state.day);
+  const plan=(SPLIT[week]||{})[day];
+  weekSelect.value=week;daySelect.value=day;
+  renderWeekStrip();
+  milestoneBanner.classList.remove("show");
+
+  // phase badge
+  const ph=getPhase(state.week);
+  phaseDot.style.background=ph.color;phaseLabel.textContent=ph.label;
+
+  if(!plan){
+    panelTitle.textContent=`Week ${state.week} · Day ${state.day}`;
+    content.innerHTML=`<div class="empty">No data.</div>`;
+    return;
+  }
+  panelTitle.textContent=plan.title||`Week ${state.week} · Day ${state.day}`;
+
+  const isRest=!plan.workout.length&&!plan.morning.length&&!plan.finish.length;
+  if(isRest){
+    mascotWrap.innerHTML=mascotSVG("tired");
+    mascotQuip.textContent=randomQuip(QUIPS.rest);
+    content.innerHTML=`<div class="restView">
+      <div class="restAnim">🛌</div>
+      <div class="restTitle">Rest & Recover</div>
+      <div class="restSub">Muscles grow during rest — you earned this 💤</div>
+    </div>`;
+    barFill.style.width="0%";progressPct.textContent="—";progressDone.textContent="0";progressTotal.textContent="0";
+    barMascot.textContent="💤";lastPct=0;return;
+  }
+
+  mascotWrap.innerHTML=mascotSVG("idle");
+  mascotQuip.textContent=randomQuip(QUIPS.start);
+
+  const normalizedPlan=withUids(plan);
+  const {morning,workout,finish}=normalizedPlan;
+  const activeItem=workout.find(item=>(item.sets||[]).some((_,i)=>!state.checks[keyFor(state.week,state.day,item.uid,i)]))||workout[0]||morning[0]||finish[0];
+  const nextItem=workout.find(item=>item!==activeItem&&(item.sets||[]).some((_,i)=>!state.checks[keyFor(state.week,state.day,item.uid,i)]));
+
+  let out="";
+  if(morning.length) out+=section(state.week,state.day,"☀️ Morning",morning,"warm up",activeItem&&activeItem.uid,nextItem&&nextItem.uid);
+  out+=workout.length?section(state.week,state.day,"🏋️ Workout",workout,"push hard",activeItem&&activeItem.uid,nextItem&&nextItem.uid):`<div class="sectionTitle">🏋️ Workout</div><div class="empty">Active rest day.</div>`;
+  if(finish.length) out+=section(state.week,state.day,"🌙 Finish",finish,"cool down",activeItem&&activeItem.uid,nextItem&&nextItem.uid);
+  content.innerHTML=out;
+
+  content.onclick=(e)=>{
+    const chip=e.target.closest(".chip");if(!chip)return;
+    const k=chip.getAttribute("data-key");
+    state.checks[k]=!state.checks[k];
+    chip.classList.toggle("checked",!!state.checks[k]);
+    const cardEl=chip.closest(".card");
+    if(cardEl){
+      const allChips=cardEl.querySelectorAll(".chip");
+      cardEl.classList.toggle("done",[...allChips].every(c=>c.classList.contains("checked")));
+    }
+    // update mascot animation on set check
+    if(state.checks[k]){
+      mascotWrap.innerHTML=mascotSVG("lift");
+      setTimeout(()=>{mascotWrap.innerHTML=mascotSVG("flex");},400);
+      setTimeout(()=>{mascotWrap.innerHTML=mascotSVG("idle");},1200);
+    }
+    saveState();renderProgress(normalizedPlan);renderWeekStrip();
+  };
+  renderProgress(normalizedPlan);
+}
+
+/* ─── CONTROLS ─── */
+weekSelect.value=String(state.week);
+daySelect.value=String(state.day);
+weekSelect.addEventListener("change",()=>{state.week=Number(weekSelect.value);lastPct=0;saveState();renderPlan();window.scrollTo({top:0,behavior:"smooth"});});
+daySelect.addEventListener("change",()=>{state.day=Number(daySelect.value);lastPct=0;saveState();renderPlan();window.scrollTo({top:0,behavior:"smooth"});});
+
+document.getElementById("resetBtn").addEventListener("click",()=>{
+  const rawPlan=(SPLIT[String(state.week)]||{})[String(state.day)];
+  if(!rawPlan)return;
+  const plan=withUids(rawPlan);
+  const prev=JSON.stringify(state.checks);
+  allKeysForDay(state.week,state.day,plan).forEach(k=>delete state.checks[k]);
+  saveState();lastPct=0;
+  updateTrustStatus(typeof navigator!=="undefined"&&navigator.onLine?"synced":"offline");
+  renderPlan();
+  showToast("Day reset",()=>{state.checks=JSON.parse(prev);saveState();lastPct=0;renderPlan();});
+});
+
+document.getElementById("markAllBtn").addEventListener("click",()=>{
+  const rawPlan=(SPLIT[String(state.week)]||{})[String(state.day)];
+  if(!rawPlan)return;
+  const plan=withUids(rawPlan);
+  const prev=JSON.stringify(state.checks);
+  allKeysForDay(state.week,state.day,plan).forEach(k=>state.checks[k]=true);
+  saveState();lastPct=0;
+  updateTrustStatus(typeof navigator!=="undefined"&&navigator.onLine?"synced":"offline");
+  renderPlan();
+  showToast("All sets marked ✓",()=>{state.checks=JSON.parse(prev);saveState();lastPct=0;renderPlan();});
+});
+
+undoBtn.addEventListener("click",()=>{if(undoSnapshot){undoSnapshot();toast.classList.remove("show");undoSnapshot=null;}});
+window.addEventListener("scroll",()=>document.getElementById("hdr").classList.toggle("compact",window.scrollY>28));
+
+initCloudState().finally(renderPlan);
+</script>
+
+<script>
+/* Auth guard — only enforces redirect when the MFJ platform (shared-api.js) is loaded */
+(function(){
+  const hasPlatform = typeof window._MFJ_PLATFORM_LOADED !== "undefined";
+  if(!hasPlatform) return; // standalone / GitHub Pages — skip redirect
+  const memberEmail=(sessionStorage.getItem("mfj_last_email")||localStorage.getItem("mfj_last_email")||"").trim().toLowerCase();
+  if(!memberEmail){ window.location.href="login.html"; }
+})();
+</script>
+</body>
+</html>
