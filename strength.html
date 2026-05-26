@@ -1059,7 +1059,7 @@ document.getElementById("resetBtn").addEventListener("click",()=>{
   const prev = JSON.stringify(state.checks);
   allKeysForDay(state.week,state.day,plan).forEach(k=>delete state.checks[k]);
   saveState();
-  updateTrustStatus(typeof navigator!=="undefined" && navigator.onLine ? "synced" : "offline");
+  updateTrustStatus(typeof navigator!=="undefined" && navigator.onLine ? "syncing" : "offline");
   document.querySelectorAll(".chip.checked").forEach(el=>el.classList.remove("checked"));
   renderProgress(plan);
   renderPlan();
@@ -1072,7 +1072,7 @@ document.getElementById("markAllBtn").addEventListener("click",()=>{
   const prev = JSON.stringify(state.checks);
   allKeysForDay(state.week,state.day,plan).forEach(k=>state.checks[k]=true);
   saveState();
-  updateTrustStatus(typeof navigator!=="undefined" && navigator.onLine ? "synced" : "offline");
+  updateTrustStatus(typeof navigator!=="undefined" && navigator.onLine ? "syncing" : "offline");
   document.querySelectorAll(".chip").forEach(el=>el.classList.add("checked"));
   renderProgress(plan);
   renderPlan();
