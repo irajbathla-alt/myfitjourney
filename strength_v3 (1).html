@@ -442,17 +442,20 @@ function getPhase(w){
 }
 
 /* ─── STORAGE (identical keys) ─── */
-const STORAGE_KEY="JFC_STRENGTH_WEEK1_V2";
-const BACKUP_KEY ="JFC_STRENGTH_WEEK1_BACKUP_V2";
+const STORAGE_BASE_KEY="JFC_STRENGTH_WEEK1_V2";
+const BACKUP_BASE_KEY ="JFC_STRENGTH_WEEK1_BACKUP_V2";
+function memberEmailKey(){return (sessionStorage.getItem("mfj_last_email")||localStorage.getItem("mfj_last_email")||"").trim().toLowerCase();}
+function storageKey(){const e=memberEmailKey();return e?`${STORAGE_BASE_KEY}::${e}`:STORAGE_BASE_KEY;}
+function backupKey(){const e=memberEmailKey();return e?`${BACKUP_BASE_KEY}::${e}`:BACKUP_BASE_KEY;}
 function loadState(){
-  try{let d=localStorage.getItem(STORAGE_KEY)||localStorage.getItem(BACKUP_KEY);
+  try{let d=localStorage.getItem(storageKey())||localStorage.getItem(backupKey())||localStorage.getItem(STORAGE_BASE_KEY)||localStorage.getItem(BACKUP_BASE_KEY);
     if(!d)return{week:1,day:1,checks:{}};return JSON.parse(d);}
   catch(_){return{week:1,day:1,checks:{}};}
 }
 let state=loadState();
 let syncTimer=null,syncInFlight=false,syncPending=false;
 function persistLocalState(){
-  try{const j=JSON.stringify(state);localStorage.setItem(STORAGE_KEY,j);localStorage.setItem(BACKUP_KEY,j);}catch(_){}
+  try{const j=JSON.stringify(state);localStorage.setItem(storageKey(),j);localStorage.setItem(backupKey(),j);}catch(_){}
 }
 async function saveStateToCloud(){
   if(syncInFlight){syncPending=true;updateTrustStatus(typeof navigator!=="undefined"&&navigator.onLine?"syncing":"offline");return;}
@@ -471,6 +474,7 @@ async function saveStateToCloud(){
   if(syncPending){if(syncTimer)clearTimeout(syncTimer);syncTimer=setTimeout(saveStateToCloud,250);}
 }
 function saveState(){
+  state._updatedAt=Date.now();
   persistLocalState();
   updateTrustStatus(typeof navigator!=="undefined"&&navigator.onLine?"syncing":"offline");
   if(syncTimer)clearTimeout(syncTimer);
@@ -492,7 +496,9 @@ async function initCloudState(){
       let remoteState=null;
       try{remoteState=JSON.parse(res.progressJson);}catch(_e){remoteState=null;}
       if(remoteState&&typeof remoteState==="object"&&remoteState.checks&&typeof remoteState.checks==="object"){
-        state=remoteState;persistLocalState();updateTrustStatus("synced");
+        const localTs=Number(state&&state._updatedAt||0);
+        const remoteTs=Number(remoteState&&remoteState._updatedAt||0);
+        state=remoteTs>=localTs?remoteState:state;persistLocalState();updateTrustStatus("synced");
       }else{
         syncPending=true;updateTrustStatus("failed");
       }

@@ -842,13 +842,18 @@ function svgIcon(name){
    Jalandhar Fitness Club Storage
    =============================== */
 
-const STORAGE_KEY = "JFC_STRENGTH_WEEK1_V2";
-const BACKUP_KEY  = "JFC_STRENGTH_WEEK1_BACKUP_V2";
+const STORAGE_BASE_KEY = "JFC_STRENGTH_WEEK1_V2";
+const BACKUP_BASE_KEY  = "JFC_STRENGTH_WEEK1_BACKUP_V2";
+function memberEmailKey(){ return (sessionStorage.getItem("mfj_last_email") || localStorage.getItem("mfj_last_email") || "").trim().toLowerCase(); }
+function storageKey(){ const e=memberEmailKey(); return e ? `${STORAGE_BASE_KEY}::${e}` : STORAGE_BASE_KEY; }
+function backupKey(){ const e=memberEmailKey(); return e ? `${BACKUP_BASE_KEY}::${e}` : BACKUP_BASE_KEY; }
 
 function loadState() {
   try {
-    let data = localStorage.getItem(STORAGE_KEY);
-    if (!data) data = localStorage.getItem(BACKUP_KEY);
+    let data = localStorage.getItem(storageKey());
+    if (!data) data = localStorage.getItem(backupKey());
+    if (!data) data = localStorage.getItem(STORAGE_BASE_KEY);
+    if (!data) data = localStorage.getItem(BACKUP_BASE_KEY);
     if (!data) return { week: 1, day: 1, checks: {} };
     return JSON.parse(data);
   } catch (_err) {
@@ -864,8 +869,8 @@ let syncPending = false;
 function persistLocalState() {
   try {
     const json = JSON.stringify(state);
-    localStorage.setItem(STORAGE_KEY, json);
-    localStorage.setItem(BACKUP_KEY, json);
+    localStorage.setItem(storageKey(), json);
+    localStorage.setItem(backupKey(), json);
   } catch (_err) {
     console.log("Storage failed.");
   }
@@ -916,6 +921,7 @@ async function saveStateToCloud() {
 }
 
 function saveState() {
+  state._updatedAt = Date.now();
   persistLocalState();
   updateTrustStatus(typeof navigator!=="undefined" && navigator.onLine ? "syncing" : "offline");
   if (syncTimer) clearTimeout(syncTimer);
@@ -934,7 +940,9 @@ async function initCloudState() {
       let remoteState = null;
       try { remoteState = JSON.parse(res.progressJson); } catch(_e) { remoteState = null; }
       if (remoteState && typeof remoteState === "object" && remoteState.checks && typeof remoteState.checks === "object") {
-        state = remoteState;
+        const localTs = Number(state && state._updatedAt || 0);
+        const remoteTs = Number(remoteState && remoteState._updatedAt || 0);
+        state = remoteTs >= localTs ? remoteState : state;
         persistLocalState();
         updateTrustStatus("synced");
       } else {
