@@ -2222,7 +2222,13 @@ async function saveStateToCloud() {
   syncPending = false;
   try {
     const progressPayload = JSON.stringify(state);
-    const res = await window.mfjCallApi("save_progress", { email: memberEmail, progressJson: progressPayload, ProgressJSon: progressPayload, progress_json: progressPayload }, 8000);
+    let res = await window.mfjCallApi("save_progress", { email: memberEmail, progressJson: progressPayload }, 8000);
+    if (!res || res.ok !== true) {
+      res = await window.mfjCallApi("save_progress", { email: memberEmail, ProgressJSon: progressPayload }, 8000);
+    }
+    if (!res || res.ok !== true) {
+      res = await window.mfjCallApi("save_progress", { email: memberEmail, progress_json: progressPayload }, 8000);
+    }
     if (!res || res.ok !== true) throw new Error("save_progress failed");
     updateTrustStatus("synced");
   } catch (_err) {
