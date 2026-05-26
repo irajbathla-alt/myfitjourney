@@ -203,7 +203,8 @@ async function saveStateToCloud() {
   syncInFlight = true;
   syncPending = false;
   try {
-    await window.mfjCallApi("save_progress", { email: memberEmail, progressJson: JSON.stringify(state) }, 8000);
+    const res = await window.mfjCallApi("save_progress", { email: memberEmail, progressJson: JSON.stringify(state) }, 8000);
+    if (!res || res.ok !== true) throw new Error("save_progress failed");
     updateTrustStatus("synced");
   } catch (_err) {
     syncPending = true;
@@ -238,11 +239,15 @@ async function initCloudState() {
   try {
     const res = await window.mfjCallApi("load_progress", { email: memberEmail }, 8000);
     if (res && res.ok && res.progressJson) {
-      const remoteState = JSON.parse(res.progressJson);
-      if (remoteState && typeof remoteState === "object") {
+      let remoteState = null;
+      try { remoteState = JSON.parse(res.progressJson); } catch(_e) { remoteState = null; }
+      if (remoteState && typeof remoteState === "object" && remoteState.checks && typeof remoteState.checks === "object") {
         state = remoteState;
         persistLocalState();
         updateTrustStatus("synced");
+      } else {
+        syncPending = true;
+        updateTrustStatus("failed");
       }
     } else {
       await saveStateToCloud();
