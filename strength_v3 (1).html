@@ -40,6 +40,13 @@ header.compact .brand .sub{opacity:0;height:0;margin:0;}
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
   transition:font-size .3s ease;}
 .brand .sub{margin:0;font-size:11px;color:var(--muted2);letter-spacing:.3px;transition:all .3s ease;}
+.syncBadge{display:inline-flex;align-items:center;gap:6px;margin-top:5px;padding:5px 10px;border-radius:999px;font-size:10px;font-weight:800;border:1px solid rgba(0,0,0,.12);background:rgba(0,0,0,.05);color:var(--muted)}
+.syncBadge::before{content:"";width:7px;height:7px;border-radius:50%;background:#9ca3af}
+.syncBadge[data-state="synced"]{background:rgba(16,185,129,.14);border-color:rgba(16,185,129,.35)} .syncBadge[data-state="synced"]::before{background:#10b981}
+.syncBadge[data-state="syncing"]{background:rgba(59,130,246,.14);border-color:rgba(59,130,246,.35)} .syncBadge[data-state="syncing"]::before{background:#3b82f6;animation:pulseDot 1.1s ease-in-out infinite}
+.syncBadge[data-state="failed"]{background:rgba(239,68,68,.14);border-color:rgba(239,68,68,.35)} .syncBadge[data-state="failed"]::before{background:#ef4444}
+.syncBadge[data-state="offline"],.syncBadge[data-state="local"]{background:rgba(245,158,11,.14);border-color:rgba(245,158,11,.35)} .syncBadge[data-state="offline"]::before,.syncBadge[data-state="local"]::before{background:#f59e0b}
+@keyframes pulseDot{0%,100%{transform:scale(.8);opacity:.65}50%{transform:scale(1.15);opacity:1}}
 
 /* mascot strip */
 .mascotStrip{display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:6px;}
@@ -213,6 +220,7 @@ header.compact .brand .sub{opacity:0;height:0;margin:0;}
   <div class="brand">
     <h1>My Fit Journey</h1>
     <p class="sub">Strength Builder · 8 Weeks · Progress Saved ✓</p>
+    <div id="syncBadge" class="syncBadge" data-state="local" aria-live="polite">Saved locally ✓</div>
   </div>
   <div class="mascotStrip">
     <div class="mascotWrap" id="mascotWrap"><!-- animated SVG injected by JS --></div>
@@ -442,39 +450,79 @@ function getPhase(w){
 }
 
 /* ─── STORAGE (identical keys) ─── */
-const STORAGE_KEY="JFC_STRENGTH_WEEK1_V2";
-const BACKUP_KEY ="JFC_STRENGTH_WEEK1_BACKUP_V2";
+const STORAGE_BASE_KEY="JFC_STRENGTH_WEEK1_V2";
+const BACKUP_BASE_KEY ="JFC_STRENGTH_WEEK1_BACKUP_V2";
+function memberEmailKey(){return (sessionStorage.getItem("mfj_last_email")||localStorage.getItem("mfj_last_email")||"").trim().toLowerCase();}
+function storageKey(){const e=memberEmailKey();return e?`${STORAGE_BASE_KEY}::${e}`:STORAGE_BASE_KEY;}
+function backupKey(){const e=memberEmailKey();return e?`${BACKUP_BASE_KEY}::${e}`:BACKUP_BASE_KEY;}
 function loadState(){
-  try{let d=localStorage.getItem(STORAGE_KEY)||localStorage.getItem(BACKUP_KEY);
+  try{let d=localStorage.getItem(storageKey())||localStorage.getItem(backupKey())||localStorage.getItem(STORAGE_BASE_KEY)||localStorage.getItem(BACKUP_BASE_KEY);
     if(!d)return{week:1,day:1,checks:{}};return JSON.parse(d);}
   catch(_){return{week:1,day:1,checks:{}};}
 }
 let state=loadState();
-let syncTimer=null,syncInFlight=false;
+let syncTimer=null,syncInFlight=false,syncPending=false;
 function persistLocalState(){
-  try{const j=JSON.stringify(state);localStorage.setItem(STORAGE_KEY,j);localStorage.setItem(BACKUP_KEY,j);}catch(_){}
+  try{const j=JSON.stringify(state);localStorage.setItem(storageKey(),j);localStorage.setItem(backupKey(),j);}catch(_){}
 }
 async function saveStateToCloud(){
-  if(syncInFlight)return;
+  if(syncInFlight){syncPending=true;updateTrustStatus(typeof navigator!=="undefined"&&navigator.onLine?"syncing":"offline");return;}
   const memberEmail=(sessionStorage.getItem("mfj_last_email")||localStorage.getItem("mfj_last_email")||"").trim().toLowerCase();
-  if(!memberEmail||typeof window.mfjCallApi!=="function")return;
+  if(!memberEmail||typeof window.mfjCallApi!=="function"){updateTrustStatus("local");return;}
+  updateTrustStatus(typeof navigator!=="undefined"&&navigator.onLine?"syncing":"offline");
   syncInFlight=true;
-  try{await window.mfjCallApi("save_progress",{email:memberEmail,progressJson:JSON.stringify(state)},8000);}catch(_){}finally{syncInFlight=false;}
+  syncPending=false;
+  try{
+    const progressPayload=JSON.stringify(state);
+    let res=await window.mfjCallApi("save_progress",{email:memberEmail,progressJson:progressPayload},8000);
+    if(!res||res.ok!==true){
+      res=await window.mfjCallApi("save_progress",{email:memberEmail,ProgressJSon:progressPayload},8000);
+    }
+    if(!res||res.ok!==true){
+      res=await window.mfjCallApi("save_progress",{email:memberEmail,progress_json:progressPayload},8000);
+    }
+    if(!res||res.ok!==true) throw new Error("save_progress failed");
+    updateTrustStatus("synced");
+  }
+  catch(_){syncPending=true;updateTrustStatus(typeof navigator!=="undefined"&&navigator.onLine?"failed":"offline");}
+  finally{syncInFlight=false;}
+  if(syncPending){if(syncTimer)clearTimeout(syncTimer);syncTimer=setTimeout(saveStateToCloud,250);}
 }
 function saveState(){
+  state._updatedAt=Date.now();
   persistLocalState();
+  updateTrustStatus(typeof navigator!=="undefined"&&navigator.onLine?"syncing":"offline");
   if(syncTimer)clearTimeout(syncTimer);
-  syncTimer=setTimeout(saveStateToCloud,500);
+  syncTimer=setTimeout(saveStateToCloud,250);
 }
-function updateTrustStatus(s){if(typeof window.mfjUpdateTrustStatus==="function")window.mfjUpdateTrustStatus(s);}
+function updateTrustStatus(s){
+  const sub=document.querySelector(".brand .sub");
+  const badge=document.getElementById("syncBadge");
+  const map={synced:"Synced ✓",syncing:"Syncing…",offline:"Offline — Local save only",local:"Saved locally ✓",failed:"Sync failed — retrying"};
+  const label=map[s]||map.local;
+  if(sub)sub.textContent=`Strength Builder · 8 Weeks · ${label}`;
+  if(badge){badge.dataset.state=s||"local";badge.textContent=label;}
+  if(typeof window.mfjUpdateTrustStatus==="function")window.mfjUpdateTrustStatus(s);
+}
 async function initCloudState(){
   const memberEmail=(sessionStorage.getItem("mfj_last_email")||localStorage.getItem("mfj_last_email")||"").trim().toLowerCase();
-  if(!memberEmail||typeof window.mfjCallApi!=="function")return;
+  if(!memberEmail||typeof window.mfjCallApi!=="function"){updateTrustStatus("local");return;}
   try{
     const res=await window.mfjCallApi("load_progress",{email:memberEmail},8000);
-    if(res&&res.ok&&res.progressJson){state=JSON.parse(res.progressJson);persistLocalState();}
+    const cloudJson=res&&(res.progressJson||res.ProgressJSon||res.progress_json||"");
+    if(res&&res.ok&&cloudJson){
+      let remoteState=null;
+      try{remoteState=JSON.parse(cloudJson);}catch(_e){remoteState=null;}
+      if(remoteState&&typeof remoteState==="object"&&remoteState.checks&&typeof remoteState.checks==="object"){
+        const localTs=Number(state&&state._updatedAt||0);
+        const remoteTs=Number(remoteState&&remoteState._updatedAt||0);
+        state=remoteTs>=localTs?remoteState:state;persistLocalState();updateTrustStatus("synced");
+      }else{
+        syncPending=true;updateTrustStatus("failed");
+      }
+    }
     else{await saveStateToCloud();}
-  }catch(_){}
+  }catch(_){updateTrustStatus(typeof navigator!=="undefined"&&navigator.onLine?"local":"offline");}
 }
 
 /* ─── ELEMENTS ─── */
@@ -727,7 +775,7 @@ document.getElementById("resetBtn").addEventListener("click",()=>{
   const prev=JSON.stringify(state.checks);
   allKeysForDay(state.week,state.day,plan).forEach(k=>delete state.checks[k]);
   saveState();lastPct=0;
-  updateTrustStatus(typeof navigator!=="undefined"&&navigator.onLine?"synced":"offline");
+  updateTrustStatus(typeof navigator!=="undefined"&&navigator.onLine?"syncing":"offline");
   renderPlan();
   showToast("Day reset",()=>{state.checks=JSON.parse(prev);saveState();lastPct=0;renderPlan();});
 });
@@ -739,7 +787,7 @@ document.getElementById("markAllBtn").addEventListener("click",()=>{
   const prev=JSON.stringify(state.checks);
   allKeysForDay(state.week,state.day,plan).forEach(k=>state.checks[k]=true);
   saveState();lastPct=0;
-  updateTrustStatus(typeof navigator!=="undefined"&&navigator.onLine?"synced":"offline");
+  updateTrustStatus(typeof navigator!=="undefined"&&navigator.onLine?"syncing":"offline");
   renderPlan();
   showToast("All sets marked ✓",()=>{state.checks=JSON.parse(prev);saveState();lastPct=0;renderPlan();});
 });
@@ -747,6 +795,9 @@ document.getElementById("markAllBtn").addEventListener("click",()=>{
 undoBtn.addEventListener("click",()=>{if(undoSnapshot){undoSnapshot();toast.classList.remove("show");undoSnapshot=null;}});
 window.addEventListener("scroll",()=>document.getElementById("hdr").classList.toggle("compact",window.scrollY>28));
 
+window.addEventListener("online",()=>{updateTrustStatus("syncing");saveStateToCloud();});
+window.addEventListener("offline",()=>updateTrustStatus("offline"));
+updateTrustStatus(typeof navigator!=="undefined"&&navigator.onLine?"local":"offline");
 initCloudState().finally(renderPlan);
 </script>
 
