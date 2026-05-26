@@ -19,6 +19,7 @@ header.compact .brand .sub{opacity:.55}
 .brand{display:flex;flex-direction:column;align-items:center;gap:6px;padding:6px 0 10px;}
 .brand h1{margin:0;font-size:30px;line-height:1.05;letter-spacing:.3px;font-weight:700;font-family:"Libre Baskerville","Times New Roman",serif;text-transform:none;text-align:center;text-shadow:none;} 
 .brand .sub{margin:0;font-size:12px;color:var(--muted);text-align:center;}
+.brand .sub strong{font-weight:800;color:#111}
 .pill{display:inline-flex;align-items:center;gap:10px;padding:10px 12px;border-radius:999px;border:1px solid rgba(255,255,255,.12);background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));color:var(--text);font-weight:950;font-size:12px;letter-spacing:.2px;user-select:none;white-space:nowrap;box-shadow:inset 0 1px 0 rgba(255,255,255,.08);} 
 .pill .dot{width:10px;height:10px;border-radius:999px;background:rgba(255,255,255,.20);border:1px solid rgba(255,255,255,.25);}
 .topRow{display:flex;gap:8px;align-items:center;justify-content:center;flex-wrap:wrap;margin-top:2px;}
@@ -870,19 +871,41 @@ function persistLocalState() {
   }
 }
 
+function updateTrustStatus(mode){
+  const sub=document.querySelector(".brand .sub");
+  if(!sub) return;
+  const labelMap = {
+    synced: "Synced ✓",
+    syncing: "Syncing…",
+    offline: "Offline — Local save only",
+    local: "Saved locally ✓",
+    failed: "Sync failed — will retry"
+  };
+  const status = labelMap[mode] || labelMap.local;
+  sub.innerHTML = `Strength Builder • 8 Weeks • <strong>${safe(status)}</strong>`;
+}
+
 async function saveStateToCloud() {
   if (syncInFlight) {
     syncPending = true;
+    updateTrustStatus(typeof navigator!=="undefined" && navigator.onLine ? "syncing" : "offline");
     return;
   }
   const memberEmail = (sessionStorage.getItem("mfj_last_email") || localStorage.getItem("mfj_last_email") || "").trim().toLowerCase();
-  if (!memberEmail || typeof window.mfjCallApi !== "function") return;
+  if (!memberEmail || typeof window.mfjCallApi !== "function") {
+    updateTrustStatus("local");
+    return;
+  }
+  updateTrustStatus(typeof navigator!=="undefined" && navigator.onLine ? "syncing" : "offline");
   syncInFlight = true;
   syncPending = false;
   try {
-    await window.mfjCallApi("save_progress", { email: memberEmail, progressJson: JSON.stringify(state) }, 8000);
+    const res = await window.mfjCallApi("save_progress", { email: memberEmail, progressJson: JSON.stringify(state) }, 8000);
+    if (!res || res.ok !== true) throw new Error("save_progress failed");
+    updateTrustStatus("synced");
   } catch (_err) {
     syncPending = true;
+    updateTrustStatus(typeof navigator!=="undefined" && navigator.onLine ? "failed" : "offline");
   } finally {
     syncInFlight = false;
   }
@@ -894,18 +917,35 @@ async function saveStateToCloud() {
 
 function saveState() {
   persistLocalState();
+  updateTrustStatus(typeof navigator!=="undefined" && navigator.onLine ? "syncing" : "offline");
   if (syncTimer) clearTimeout(syncTimer);
-  syncTimer = setTimeout(saveStateToCloud, 500);
+  syncTimer = setTimeout(saveStateToCloud, 250);
 }
 
 async function initCloudState() {
   const memberEmail = (sessionStorage.getItem("mfj_last_email") || localStorage.getItem("mfj_last_email") || "").trim().toLowerCase();
-  if (!memberEmail || typeof window.mfjCallApi !== "function") return;
+  if (!memberEmail || typeof window.mfjCallApi !== "function") {
+    updateTrustStatus("local");
+    return;
+  }
   try {
     const res = await window.mfjCallApi("load_progress", { email: memberEmail }, 8000);
-    if (res && res.ok && res.progressJson) { state = JSON.parse(res.progressJson); persistLocalState(); }
+    if (res && res.ok && res.progressJson) {
+      let remoteState = null;
+      try { remoteState = JSON.parse(res.progressJson); } catch(_e) { remoteState = null; }
+      if (remoteState && typeof remoteState === "object" && remoteState.checks && typeof remoteState.checks === "object") {
+        state = remoteState;
+        persistLocalState();
+        updateTrustStatus("synced");
+      } else {
+        syncPending = true;
+        updateTrustStatus("failed");
+      }
+    }
     else { await saveStateToCloud(); }
-  } catch (_err) {}
+  } catch (_err) {
+    updateTrustStatus(typeof navigator!=="undefined" && navigator.onLine ? "local" : "offline");
+  }
 }
 
 const content=document.getElementById("content");
@@ -1031,7 +1071,7 @@ document.getElementById("resetBtn").addEventListener("click",()=>{
   const prev = JSON.stringify(state.checks);
   allKeysForDay(state.week,state.day,plan).forEach(k=>delete state.checks[k]);
   saveState();
-  updateTrustStatus(typeof navigator!=="undefined" && navigator.onLine ? "synced" : "offline");
+  updateTrustStatus(typeof navigator!=="undefined" && navigator.onLine ? "syncing" : "offline");
   document.querySelectorAll(".chip.checked").forEach(el=>el.classList.remove("checked"));
   renderProgress(plan);
   renderPlan();
@@ -1044,7 +1084,7 @@ document.getElementById("markAllBtn").addEventListener("click",()=>{
   const prev = JSON.stringify(state.checks);
   allKeysForDay(state.week,state.day,plan).forEach(k=>state.checks[k]=true);
   saveState();
-  updateTrustStatus(typeof navigator!=="undefined" && navigator.onLine ? "synced" : "offline");
+  updateTrustStatus(typeof navigator!=="undefined" && navigator.onLine ? "syncing" : "offline");
   document.querySelectorAll(".chip").forEach(el=>el.classList.add("checked"));
   renderProgress(plan);
   renderPlan();
@@ -1058,6 +1098,9 @@ window.addEventListener("scroll", ()=>document.querySelector("header").classList
 weekSelect.value = String(state.week);
 daySelect.value = String(state.day);
 
+window.addEventListener("online", ()=>{ updateTrustStatus("syncing"); saveStateToCloud(); });
+window.addEventListener("offline", ()=>updateTrustStatus("offline"));
+updateTrustStatus(typeof navigator!=="undefined" && navigator.onLine ? "local" : "offline");
 initCloudState().finally(renderPlan);
 </script>
 
