@@ -2184,6 +2184,7 @@ function loadState() {
 let state = loadState();
 let syncTimer = null;
 let syncInFlight = false;
+let syncPending = false;
 
 function persistLocalState() {
   try {
@@ -2196,41 +2197,68 @@ function persistLocalState() {
 }
 
 async function saveStateToCloud() {
-  if (syncInFlight) return;
+  if (syncInFlight) {
+    syncPending = true;
+    updateTrustStatus(typeof navigator!=="undefined" && navigator.onLine ? "syncing" : "offline");
+    return;
+  }
   const memberEmail = (sessionStorage.getItem("mfj_last_email") || localStorage.getItem("mfj_last_email") || "").trim().toLowerCase();
-  if (!memberEmail || typeof window.mfjCallApi !== "function") return;
+  if (!memberEmail || typeof window.mfjCallApi !== "function") { updateTrustStatus("local"); return; }
+  updateTrustStatus(typeof navigator!=="undefined" && navigator.onLine ? "syncing" : "offline");
   syncInFlight = true;
+  syncPending = false;
   try {
-    await window.mfjCallApi("save_progress", { email: memberEmail, progressJson: JSON.stringify(state) }, 8000);
+    const res = await window.mfjCallApi("save_progress", { email: memberEmail, progressJson: JSON.stringify(state) }, 8000);
+    if (!res || res.ok !== true) throw new Error("save_progress failed");
+    updateTrustStatus("synced");
   } catch (_err) {
-    // Keep local state even if cloud sync fails.
+    syncPending = true;
+    updateTrustStatus(typeof navigator!=="undefined" && navigator.onLine ? "failed" : "offline");
   } finally {
     syncInFlight = false;
+  }
+  if (syncPending) {
+    if (syncTimer) clearTimeout(syncTimer);
+    syncTimer = setTimeout(saveStateToCloud, 250);
   }
 }
 
 function saveState() {
   persistLocalState();
+  updateTrustStatus(typeof navigator!=="undefined" && navigator.onLine ? "syncing" : "offline");
   if (syncTimer) clearTimeout(syncTimer);
-  syncTimer = setTimeout(saveStateToCloud, 500);
+  syncTimer = setTimeout(saveStateToCloud, 250);
+}
+
+function updateTrustStatus(mode){
+  const sub = document.querySelector(".brand .sub");
+  const statusMap = { synced:"Synced ✓", syncing:"Syncing…", offline:"Offline — Local save only", local:"Saved locally ✓", failed:"Sync failed — retrying" };
+  const status = statusMap[mode] || statusMap.local;
+  if (sub) sub.textContent = `Bikini Ready • 8 Weeks • ${status}`;
+  if (typeof window.mfjUpdateTrustStatus === "function") window.mfjUpdateTrustStatus(mode);
 }
 
 async function initCloudState() {
   const memberEmail = (sessionStorage.getItem("mfj_last_email") || localStorage.getItem("mfj_last_email") || "").trim().toLowerCase();
-  if (!memberEmail || typeof window.mfjCallApi !== "function") return;
+  if (!memberEmail || typeof window.mfjCallApi !== "function") { updateTrustStatus("local"); return; }
   try {
     const res = await window.mfjCallApi("load_progress", { email: memberEmail }, 8000);
     if (res && res.ok && res.progressJson) {
-      const remoteState = JSON.parse(res.progressJson);
-      if (remoteState && typeof remoteState === "object") {
+      let remoteState = null;
+      try { remoteState = JSON.parse(res.progressJson); } catch(_e) { remoteState = null; }
+      if (remoteState && typeof remoteState === "object" && remoteState.checks && typeof remoteState.checks === "object") {
         state = remoteState;
         persistLocalState();
+        updateTrustStatus("synced");
+      } else {
+        syncPending = true;
+        updateTrustStatus("failed");
       }
     } else {
       await saveStateToCloud();
     }
   } catch (_err) {
-    // Local fallback is already loaded.
+    updateTrustStatus(typeof navigator!=="undefined" && navigator.onLine ? "local" : "offline");
   }
 }
 
@@ -2351,6 +2379,9 @@ document.getElementById("markAllBtn").addEventListener("click",()=>{
   renderProgress(plan);
 });
 
+window.addEventListener("online", ()=>{ updateTrustStatus("syncing"); saveStateToCloud(); });
+window.addEventListener("offline", ()=>updateTrustStatus("offline"));
+updateTrustStatus(typeof navigator!=="undefined" && navigator.onLine ? "local" : "offline");
 initCloudState().finally(renderPlan);
 </script>
 
