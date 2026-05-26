@@ -216,7 +216,8 @@ async function saveStateToCloud() {
   syncInFlight = true;
   syncPending = false;
   try {
-    const res = await window.mfjCallApi("save_progress", { email: memberEmail, progressJson: JSON.stringify(state) }, 8000);
+    const progressPayload = JSON.stringify(state);
+    const res = await window.mfjCallApi("save_progress", { email: memberEmail, progressJson: progressPayload, ProgressJSon: progressPayload, progress_json: progressPayload }, 8000);
     if (!res || res.ok !== true) throw new Error("save_progress failed");
     updateTrustStatus("synced");
   } catch (_err) {
@@ -254,9 +255,10 @@ async function initCloudState() {
   if (!memberEmail || typeof window.mfjCallApi !== "function") { updateTrustStatus("local"); return; }
   try {
     const res = await window.mfjCallApi("load_progress", { email: memberEmail }, 8000);
-    if (res && res.ok && res.progressJson) {
+    const cloudJson = res && (res.progressJson || res.ProgressJSon || res.progress_json || "");
+    if (res && res.ok && cloudJson) {
       let remoteState = null;
-      try { remoteState = JSON.parse(res.progressJson); } catch(_e) { remoteState = null; }
+      try { remoteState = JSON.parse(cloudJson); } catch(_e) { remoteState = null; }
       if (remoteState && typeof remoteState === "object" && remoteState.checks && typeof remoteState.checks === "object") {
         const localTs = Number(state && state._updatedAt || 0);
         const remoteTs = Number(remoteState && remoteState._updatedAt || 0);
