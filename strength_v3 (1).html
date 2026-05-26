@@ -442,39 +442,69 @@ function getPhase(w){
 }
 
 /* ─── STORAGE (identical keys) ─── */
-const STORAGE_KEY="JFC_STRENGTH_WEEK1_V2";
-const BACKUP_KEY ="JFC_STRENGTH_WEEK1_BACKUP_V2";
+const STORAGE_BASE_KEY="JFC_STRENGTH_WEEK1_V2";
+const BACKUP_BASE_KEY ="JFC_STRENGTH_WEEK1_BACKUP_V2";
+function memberEmailKey(){return (sessionStorage.getItem("mfj_last_email")||localStorage.getItem("mfj_last_email")||"").trim().toLowerCase();}
+function storageKey(){const e=memberEmailKey();return e?`${STORAGE_BASE_KEY}::${e}`:STORAGE_BASE_KEY;}
+function backupKey(){const e=memberEmailKey();return e?`${BACKUP_BASE_KEY}::${e}`:BACKUP_BASE_KEY;}
 function loadState(){
-  try{let d=localStorage.getItem(STORAGE_KEY)||localStorage.getItem(BACKUP_KEY);
+  try{let d=localStorage.getItem(storageKey())||localStorage.getItem(backupKey())||localStorage.getItem(STORAGE_BASE_KEY)||localStorage.getItem(BACKUP_BASE_KEY);
     if(!d)return{week:1,day:1,checks:{}};return JSON.parse(d);}
   catch(_){return{week:1,day:1,checks:{}};}
 }
 let state=loadState();
-let syncTimer=null,syncInFlight=false;
+let syncTimer=null,syncInFlight=false,syncPending=false;
 function persistLocalState(){
-  try{const j=JSON.stringify(state);localStorage.setItem(STORAGE_KEY,j);localStorage.setItem(BACKUP_KEY,j);}catch(_){}
+  try{const j=JSON.stringify(state);localStorage.setItem(storageKey(),j);localStorage.setItem(backupKey(),j);}catch(_){}
 }
 async function saveStateToCloud(){
-  if(syncInFlight)return;
+  if(syncInFlight){syncPending=true;updateTrustStatus(typeof navigator!=="undefined"&&navigator.onLine?"syncing":"offline");return;}
   const memberEmail=(sessionStorage.getItem("mfj_last_email")||localStorage.getItem("mfj_last_email")||"").trim().toLowerCase();
-  if(!memberEmail||typeof window.mfjCallApi!=="function")return;
+  if(!memberEmail||typeof window.mfjCallApi!=="function"){updateTrustStatus("local");return;}
+  updateTrustStatus(typeof navigator!=="undefined"&&navigator.onLine?"syncing":"offline");
   syncInFlight=true;
-  try{await window.mfjCallApi("save_progress",{email:memberEmail,progressJson:JSON.stringify(state)},8000);}catch(_){}finally{syncInFlight=false;}
+  syncPending=false;
+  try{
+    const res=await window.mfjCallApi("save_progress",{email:memberEmail,progressJson:JSON.stringify(state)},8000);
+    if(!res||res.ok!==true) throw new Error("save_progress failed");
+    updateTrustStatus("synced");
+  }
+  catch(_){syncPending=true;updateTrustStatus(typeof navigator!=="undefined"&&navigator.onLine?"failed":"offline");}
+  finally{syncInFlight=false;}
+  if(syncPending){if(syncTimer)clearTimeout(syncTimer);syncTimer=setTimeout(saveStateToCloud,250);}
 }
 function saveState(){
+  state._updatedAt=Date.now();
   persistLocalState();
+  updateTrustStatus(typeof navigator!=="undefined"&&navigator.onLine?"syncing":"offline");
   if(syncTimer)clearTimeout(syncTimer);
-  syncTimer=setTimeout(saveStateToCloud,500);
+  syncTimer=setTimeout(saveStateToCloud,250);
 }
-function updateTrustStatus(s){if(typeof window.mfjUpdateTrustStatus==="function")window.mfjUpdateTrustStatus(s);}
+function updateTrustStatus(s){
+  const sub=document.querySelector(".brand .sub");
+  const map={synced:"Synced ✓",syncing:"Syncing…",offline:"Offline — Local save only",local:"Saved locally ✓",failed:"Sync failed — retrying"};
+  const label=map[s]||map.local;
+  if(sub)sub.textContent=`Strength Builder · 8 Weeks · ${label}`;
+  if(typeof window.mfjUpdateTrustStatus==="function")window.mfjUpdateTrustStatus(s);
+}
 async function initCloudState(){
   const memberEmail=(sessionStorage.getItem("mfj_last_email")||localStorage.getItem("mfj_last_email")||"").trim().toLowerCase();
-  if(!memberEmail||typeof window.mfjCallApi!=="function")return;
+  if(!memberEmail||typeof window.mfjCallApi!=="function"){updateTrustStatus("local");return;}
   try{
     const res=await window.mfjCallApi("load_progress",{email:memberEmail},8000);
-    if(res&&res.ok&&res.progressJson){state=JSON.parse(res.progressJson);persistLocalState();}
+    if(res&&res.ok&&res.progressJson){
+      let remoteState=null;
+      try{remoteState=JSON.parse(res.progressJson);}catch(_e){remoteState=null;}
+      if(remoteState&&typeof remoteState==="object"&&remoteState.checks&&typeof remoteState.checks==="object"){
+        const localTs=Number(state&&state._updatedAt||0);
+        const remoteTs=Number(remoteState&&remoteState._updatedAt||0);
+        state=remoteTs>=localTs?remoteState:state;persistLocalState();updateTrustStatus("synced");
+      }else{
+        syncPending=true;updateTrustStatus("failed");
+      }
+    }
     else{await saveStateToCloud();}
-  }catch(_){}
+  }catch(_){updateTrustStatus(typeof navigator!=="undefined"&&navigator.onLine?"local":"offline");}
 }
 
 /* ─── ELEMENTS ─── */
@@ -727,7 +757,7 @@ document.getElementById("resetBtn").addEventListener("click",()=>{
   const prev=JSON.stringify(state.checks);
   allKeysForDay(state.week,state.day,plan).forEach(k=>delete state.checks[k]);
   saveState();lastPct=0;
-  updateTrustStatus(typeof navigator!=="undefined"&&navigator.onLine?"synced":"offline");
+  updateTrustStatus(typeof navigator!=="undefined"&&navigator.onLine?"syncing":"offline");
   renderPlan();
   showToast("Day reset",()=>{state.checks=JSON.parse(prev);saveState();lastPct=0;renderPlan();});
 });
@@ -739,7 +769,7 @@ document.getElementById("markAllBtn").addEventListener("click",()=>{
   const prev=JSON.stringify(state.checks);
   allKeysForDay(state.week,state.day,plan).forEach(k=>state.checks[k]=true);
   saveState();lastPct=0;
-  updateTrustStatus(typeof navigator!=="undefined"&&navigator.onLine?"synced":"offline");
+  updateTrustStatus(typeof navigator!=="undefined"&&navigator.onLine?"syncing":"offline");
   renderPlan();
   showToast("All sets marked ✓",()=>{state.checks=JSON.parse(prev);saveState();lastPct=0;renderPlan();});
 });
@@ -747,6 +777,9 @@ document.getElementById("markAllBtn").addEventListener("click",()=>{
 undoBtn.addEventListener("click",()=>{if(undoSnapshot){undoSnapshot();toast.classList.remove("show");undoSnapshot=null;}});
 window.addEventListener("scroll",()=>document.getElementById("hdr").classList.toggle("compact",window.scrollY>28));
 
+window.addEventListener("online",()=>{updateTrustStatus("syncing");saveStateToCloud();});
+window.addEventListener("offline",()=>updateTrustStatus("offline"));
+updateTrustStatus(typeof navigator!=="undefined"&&navigator.onLine?"local":"offline");
 initCloudState().finally(renderPlan);
 </script>
 
