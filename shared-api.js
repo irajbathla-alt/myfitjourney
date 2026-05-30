@@ -54,12 +54,3 @@ window.mfjCallApi = function(action, payload, timeoutMs){
 
   return attempts.reduce((chain, attemptFn) => chain.catch(() => attemptFn()), Promise.reject());
 };
-
-(function loadMfjUpgrades(){
-  if (window.MFJ_UPGRADES_LOADED) return;
-  window.MFJ_UPGRADES_LOADED = true;
-  const script = document.createElement('script');
-  script.src = 'mfj-upgrades.js?v=20260530';
-  script.defer = true;
-  document.head.appendChild(script);
-})();
